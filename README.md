@@ -1,7 +1,6 @@
 
 # NOPTIS GID Inspector
 
-A small React + Vite application for parsing and validating GID values.  
 The application detects a GID type from an input prefix, splits the value into segments based on layout rules, and validates each segment.
 
 ## Features
