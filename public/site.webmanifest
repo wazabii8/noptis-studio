@@ -1,6 +1,6 @@
 {
-  "name": "MyWebSite",
-  "short_name": "MySite",
+  "name": "NOPTIS GID Inspector",
+  "short_name": "GID",
   "icons": [
     {
       "src": "/web-app-manifest-192x192.png",
