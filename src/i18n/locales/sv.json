@@ -14,6 +14,7 @@
   "stationEntrancePoint": "Stationsentré",
   "journeyPatternPoint": "Turmönsterpunkt",
   "vehicle": "Fordon",
+  "virtualVehicle": "Virtuellt Fordon",
   "block": "Omlopp",
   "employee": "Anställd",
   "duty": "Förartjänst",
@@ -40,5 +41,6 @@
   "zoneType": "Zontyp",
   "zoneNumber": "Zonnummer",
   "placeNumber": "Platsnummer",
-  "equipmentNumber": "Utrustningsnummer"
+  "equipmentNumber": "Utrustningsnummer",
+  "virtualVehicleNumber": "Virtuellt fordonsnummer"
 }

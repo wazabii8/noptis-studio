@@ -61,6 +61,11 @@ export const createGidTypes = (locale: Locale) => ({
     prefix: "9031",
     layout: ["PREFIX", "THM", "CONTRACTOR", "VEHICLE"],
   },
+  VIRTUAL_VEHICLE: {
+    label: t(locale, "virtualVehicle", "Virtual Vehicle"),
+    prefix: "9038",
+    layout: ["PREFIX", "VIRTUAL_VEHICLE_NO"],
+  },
   BLOCK: {
     label: t(locale, "block", "Block"),
     prefix: "9041",
@@ -118,4 +123,5 @@ export const createSegments = (locale: Locale) => ({
   ZONE_NO: { length: 7, label: t(locale, "zoneNumber", "Zone Number") },
   PLACE: { length: 8, label: t(locale, "placeNumber", "Place Number") },
   EQUIP: { length: 9, label: t(locale, "equipmentNumber", "Equipment Number") },
+  VIRTUAL_VEHICLE_NO: { length: 12, label: t(locale, "virtualVehicleNumber", "Virtual Vehicle Number") },
 });

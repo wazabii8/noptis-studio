@@ -14,6 +14,7 @@
   "stationEntrancePoint": "Station Entrance Point",
   "journeyPatternPoint": "Journey Pattern Point",
   "vehicle": "Vehicle",
+  "virtualVehicle": "Virtual Vehicle",
   "block": "Block",
   "employee": "Employee",
   "duty": "Duty",
@@ -40,5 +41,6 @@
   "zoneType": "Zone Type",
   "zoneNumber": "Zone Number",
   "placeNumber": "Place Number",
-  "equipmentNumber": "Equipment Number"
+  "equipmentNumber": "Equipment Number",
+  "virtualVehicleNumber": "Virtual Vehicle Number"
 }
