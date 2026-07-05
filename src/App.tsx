@@ -9,6 +9,7 @@ import Table from "@/components/Table.tsx";
 type Segment = {
   key: string;
   label: string;
+  description: string;
   value: string;
   inpValue: string;
   isValid: boolean;
@@ -70,7 +71,7 @@ function App() {
             {gidResult && (
               <div>
                 <h2 className={"headline-4 mb-2"}>{gidResult.gidType.label}</h2>
-                <Table segments={gidResult.segmentedResult as Segment[]}></Table>
+                <Table title={t(lang, "GIDSegmentDetails")} segments={gidResult.segmentedResult as Segment[]}></Table>
               </div>
             )}
           </div>

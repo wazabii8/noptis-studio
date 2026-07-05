@@ -1,5 +1,5 @@
 import {createSegments} from "@/segments/Segments";
-import { type Locale } from "@/i18n/locale";
+import { t, type Locale } from "@/i18n/locale";
 
 type LayoutItem = string | { index: string };
 
@@ -65,7 +65,8 @@ export function getSegmentedResult(lang: Locale, gidTypeLayout: string[], input:
       inpValue: inpValue,
       label: row?.label ?? "Padding",
       isValid: isValid,
-      isPadding: isPadding
+      isPadding: isPadding,
+      description: row?.description ?? t(lang, "paddingDesc"),
     });
 
     start += length
