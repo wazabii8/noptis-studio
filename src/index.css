@@ -10,6 +10,15 @@
         @apply px-3 py-2 text-left;
     }
 
+    table th {
+        width: 60%;
+        min-width: 220px;
+    }
+
+    table td button, table th, button {
+        @apply text-left;
+    }
+
     label {
         @apply mb-1 block text-base font-semibold;
     }
@@ -36,6 +45,14 @@
 
     input {
         width: 100%;
+    }
+
+    .button-primary {
+        @apply bg-slate-700 text-white py-2 px-3 rounded-lg;
+    }
+
+    .button-primary:hover {
+        @apply bg-slate-800;
     }
 
     pre {
@@ -107,9 +124,24 @@
     p {
         @apply mb-2;
     }
+
+    input {
+        border: 1px solid #CCC;
+        @apply p-2 text-black mb-4;
+    }
 }
 
+.color-noptis {
+    color: #A9113F;
+}
 
+.color-success {
+    color: #1D9D55;
+}
+
+.border {
+    border: 1px solid #CCC;
+}
 
 
 @media (prefers-color-scheme: light) {
