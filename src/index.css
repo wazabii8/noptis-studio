@@ -26,11 +26,12 @@
 
     button {
         cursor: pointer;
-        border: none;
+        padding: 0;
     }
 
-    button:hover {
-        background: none !important;
+    button, button:hover {
+        background: none;
+        border: none;
     }
 
     input {
@@ -125,12 +126,7 @@
         color: #747bff;
     }
 
-    button {
-        background-color: #f9f9f9;
-        border: 1px solid #111;
-    }
-
-    input, button, table td, table th{
+    input, table td, table th{
         border-color: #111;
     }
 }
