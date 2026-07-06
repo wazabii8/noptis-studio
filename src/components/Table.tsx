@@ -1,8 +1,8 @@
 import Modal from "@/components/Modal.tsx";
 import Text from "@/components/Text.tsx";
 import Form from "@/components/Form.tsx";
-import {type ReactNode, useEffect, useState} from "react";
-import {getGidSegment, type GidSegmentValue} from "@/lib/localDb";
+import { type ReactNode, useEffect, useState } from "react";
+import { getGidSegment, type GidSegmentValue } from "@/lib/localDb";
 
 type Segment = {
   key: string;
@@ -24,6 +24,7 @@ type ModalFormButtonProps = {
   value: string;
   valid: boolean;
   segmentKey: string;
+  savedValue?: string;
   onOpen: (title: string, segmentName: string, value: string) => void;
 };
 
@@ -32,15 +33,18 @@ function OpenFormModalButton({
                                value,
                                valid,
                                segmentKey,
+                               savedValue,
                                onOpen,
                              }: ModalFormButtonProps) {
-  const [savedSegment, setSavedSegment] = useState<GidSegmentValue | undefined>(
-    undefined
-  );
+  const [savedSegment, setSavedSegment] = useState<GidSegmentValue | undefined>();
 
   const segmentName = `${segmentKey}_${value}`;
 
   useEffect(() => {
+    if (segmentKey !== "THM" && segmentKey !== "CONTRACTOR") {
+      return;
+    }
+
     if (!valid) {
       return;
     }
@@ -51,23 +55,30 @@ function OpenFormModalButton({
     }
 
     void loadSavedSegment();
-  }, [valid, segmentName]);
+  }, [valid, segmentName, segmentKey]);
+
+  if (segmentKey !== "THM" && segmentKey !== "CONTRACTOR") {
+    return <span>{value}</span>;
+  }
 
   if (!valid) {
     return <span className="color-noptis">{value}</span>;
   }
 
+  const displayValue = savedValue ?? savedSegment?.value;
+
   return (
-    <button onClick={() => onOpen(title, segmentName, value)}>
-      {value}
-      {savedSegment?.value ? ` (${savedSegment.value})` : ""}
+    <button className={"font-bold"} onClick={() => onOpen(title, segmentName, value)}>
+      <span>{value}</span>
+      <span className={"text-sm"}>{displayValue ? ` (${displayValue})` : ""}</span>
     </button>
   );
 }
 
-function Table({title, segments}: TableProps) {
+function Table({ title, segments }: TableProps) {
   const [show, setShow] = useState(false);
   const [modalContent, setModalContent] = useState<ReactNode>(null);
+  const [savedValues, setSavedValues] = useState<Record<string, string>>({});
 
   const openModal = (segment: Segment) => {
     setShow(true);
@@ -91,7 +102,19 @@ function Table({title, segments}: TableProps) {
   ) => {
     setShow(true);
     setModalContent(
-      <Form title={title} segmentKey={segmentName} segmentValue={value}/>
+      <Form
+        title={title}
+        segmentKey={segmentName}
+        segmentValue={value}
+        onSaved={(key, savedValue) => {
+
+          setShow(false);
+          setSavedValues((current) => ({
+            ...current,
+            [key]: savedValue,
+          }));
+        }}
+      />
     );
   };
 
@@ -106,32 +129,37 @@ function Table({title, segments}: TableProps) {
 
       <table>
         <tbody>
-        {segments.map((segment, index) => (
-          <tr key={`${segment.key}-${index}`}>
-            <th>
-              <button onClick={() => openModal(segment)}>
-                {segment.label}
-              </button>
-            </th>
+        {segments.map((segment, index) => {
+          const segmentName = `${segment.key}_${segment.inpValue}`;
 
-            <td
-              className={segment.isValid ? "valid" : "error"}
-              title={
-                segment.isValid
-                  ? segment.value
-                  : `${segment.inpValue}->${segment.value}`
-              }
-            >
-              <OpenFormModalButton
-                title={segment.label}
-                valid={segment.isValid}
-                value={segment.inpValue}
-                segmentKey={segment.key}
-                onOpen={openFormModal}
-              />
-            </td>
-          </tr>
-        ))}
+          return (
+            <tr key={`${segment.key}-${index}`}>
+              <th>
+                <button onClick={() => openModal(segment)}>
+                  {segment.label}
+                </button>
+              </th>
+
+              <td
+                className={segment.isValid ? "valid" : "error"}
+                title={
+                  segment.isValid
+                    ? segment.value
+                    : `${segment.inpValue}->${segment.value}`
+                }
+              >
+                <OpenFormModalButton
+                  title={segment.label}
+                  valid={segment.isValid}
+                  value={segment.inpValue}
+                  segmentKey={segment.key}
+                  savedValue={savedValues[segmentName]}
+                  onOpen={openFormModal}
+                />
+              </td>
+            </tr>
+          );
+        })}
         </tbody>
       </table>
     </div>

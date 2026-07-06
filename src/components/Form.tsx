@@ -5,35 +5,30 @@ type FormProps = {
   title: string;
   segmentKey: string;
   segmentValue: string;
+  onSaved?: (segmentKey: string, value: string) => void;
 };
 
-function Form({ title, segmentKey, segmentValue }: FormProps) {
+function Form({ title, segmentKey, segmentValue, onSaved }: FormProps) {
   const [value, setValue] = useState("");
 
   useEffect(() => {
     async function loadSegment() {
       const savedSegment = await getGidSegment(segmentKey);
-
-      if (savedSegment?.value) {
-        setValue(savedSegment.value);
-        return;
-      }
-
-      setValue("");
+      setValue(savedSegment?.value ?? "");
     }
+
     void loadSegment();
   }, [segmentKey]);
 
   return (
     <div>
-      <h1 className="headline-2">{title}</h1>
 
-      <p>
-        Segment value: <strong>{segmentValue}</strong>
-      </p>
+      <h2 className={"headline-3 mb-5"}>{title}</h2>
+      <p>Segment value: <strong>{segmentValue}</strong></p>
 
       <input
         type="text"
+        className={"border p-2"}
         name={segmentKey}
         placeholder="What is this segment?"
         value={value}
@@ -41,8 +36,10 @@ function Form({ title, segmentKey, segmentValue }: FormProps) {
       />
 
       <button
+        className={"button-primary"}
         onClick={async () => {
           await saveGidSegment(segmentKey, value);
+          onSaved?.(segmentKey, value);
         }}
       >
         Save
