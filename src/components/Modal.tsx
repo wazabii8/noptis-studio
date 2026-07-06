@@ -30,7 +30,7 @@ function Modal({ title, content, open, onClose }: ModalProps) {
           <button
             type="button"
             onClick={onClose}
-            className="rounded-full p-2 text-zinc-500 transition hover:bg-zinc-100 hover:text-zinc-900"
+            className="rounded-full p-2 text-zinc-500 transition hover:text-zinc-900"
             aria-label="Close modal"
           >
             ✕
