@@ -57,12 +57,12 @@ function OpenFormModalButton({
     void loadSavedSegment();
   }, [valid, segmentName, segmentKey]);
 
-  if (segmentKey !== "THM" && segmentKey !== "CONTRACTOR") {
-    return <span>{value}</span>;
-  }
-
   if (!valid) {
     return <span className="color-noptis">{value}</span>;
+  }
+
+  if (segmentKey !== "THM" && segmentKey !== "CONTRACTOR") {
+    return <span>{value}</span>;
   }
 
   const displayValue = savedValue ?? savedSegment?.value;
