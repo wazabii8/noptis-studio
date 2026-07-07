@@ -1,7 +1,12 @@
 import {createSegments} from "@/segments/Segments";
-import { t, type Locale } from "@/i18n/locale";
+import {t, type Locale} from "@/i18n/locale";
 
 type LayoutItem = string | { index: string };
+
+type GidType = {
+  inpValue: string;
+}
+
 
 /**
  * Extracts the prefix (first 4 characters) from an input string.
@@ -46,8 +51,7 @@ const hasIndex = (x: LayoutItem): x is { index: string } => {
  * @param {string} input Raw GID string.
  * @returns {Array<{key: string, value: string, label: string}>} Ordered segment extraction result.
  */
-export function getSegmentedResult(lang: Locale, gidTypeLayout: string[], input: string): object
-{
+export function getSegmentedResult(lang: Locale, gidTypeLayout: string[], input: string): object {
   const result = [];
   let start = 0;
   for (const layout of gidTypeLayout) {
@@ -72,4 +76,18 @@ export function getSegmentedResult(lang: Locale, gidTypeLayout: string[], input:
     start += length
   }
   return result;
+}
+
+/**
+ * Returns a valid GID string from an array list of segments
+ *
+ * @param segments
+ */
+export function getGIDFromSegmentObj(segments: GidType[]): string {
+  let value = "";
+  for (const segment of segments) {
+    const {inpValue} = segment;
+    value += inpValue;
+  }
+  return value;
 }

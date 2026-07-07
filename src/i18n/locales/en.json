@@ -23,6 +23,11 @@
   "place": "Place",
   "bridgingDevice": "Bridging Device",
   "GIDSegmentDetails": "GID Segment Details",
+  "GIDNumber": "GID Number",
+  "segmentValue": "Segment value",
+  "save": "Save",
+  "GIDPlaceholder": "Fill in GID number",
+  "segmentPlaceholder": "What is this segment?",
 
   "prefix": "Prefix",
   "thmNumber": "TPA Number",

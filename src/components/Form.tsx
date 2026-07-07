@@ -1,5 +1,6 @@
 import { saveGidSegment, getGidSegment } from "@/lib/localDb";
 import { useEffect, useState } from "react";
+import {useTranslation} from "@/i18n/useTranslation";
 
 type FormProps = {
   title: string;
@@ -9,6 +10,7 @@ type FormProps = {
 };
 
 function Form({ title, segmentKey, segmentValue, onSaved }: FormProps) {
+  const {t} = useTranslation();
   const [value, setValue] = useState("");
 
   useEffect(() => {
@@ -24,13 +26,13 @@ function Form({ title, segmentKey, segmentValue, onSaved }: FormProps) {
     <div>
 
       <h2 className={"headline-3 mb-5"}>{title}</h2>
-      <p>Segment value: <strong>{segmentValue}</strong></p>
+      <p>{t("segmentValue")}: <strong>{segmentValue}</strong></p>
 
       <input
         type="text"
         className={"border p-2"}
         name={segmentKey}
-        placeholder="What is this segment?"
+        placeholder={t("segmentPlaceholder")}
         value={value}
         onChange={(e) => setValue(e.target.value)}
       />
@@ -42,7 +44,7 @@ function Form({ title, segmentKey, segmentValue, onSaved }: FormProps) {
           onSaved?.(segmentKey, value);
         }}
       >
-        Save
+        {t("save")}
       </button>
     </div>
   );

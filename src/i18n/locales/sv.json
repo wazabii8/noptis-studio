@@ -23,6 +23,11 @@
   "place": "Plats",
   "bridgingDevice": "Bryggenhet",
   "GIDSegmentDetails": "GID-segmentinformation",
+  "GIDNumber": "GID-nummer",
+  "segmentValue": "Segment värde",
+  "save": "Spara",
+  "GIDPlaceholder": "Fyll i GID-nummer",
+  "segmentPlaceholder": "Vad är detta segmentet?",
 
   "prefix": "Prefix",
   "thmNumber": "TPA-nummer",

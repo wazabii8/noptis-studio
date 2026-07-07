@@ -23,12 +23,12 @@
         @apply mb-1 block text-base font-semibold;
     }
 
-    input, button {
+    input {
         @apply px-3 py-2 text-base rounded-lg;
         border: 1px solid #FFF;
     }
 
-    input:focus, button:focus {
+    input:focus {
         outline: none;
         background-color: rgba(134, 134, 134, 0.1);
     }
@@ -41,6 +41,7 @@
     button, button:hover, button:active, button:focus {
         background: none;
         border: none;
+        outline: none;
     }
 
     input {

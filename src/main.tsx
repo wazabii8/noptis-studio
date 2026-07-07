@@ -4,6 +4,7 @@ import "./index.css";
 import App from "./App.tsx";
 import { registerSW } from "virtual:pwa-register";
 import { requestPersistentStorage } from "./lib/persistentStorage";
+import { LocaleProvider } from "@/i18n/LocaleContext";
 
 // Will add a persistent storage request to the browser
 void requestPersistentStorage();
@@ -21,6 +22,8 @@ const updateSW = registerSW({
 
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
-    <App />
+    <LocaleProvider>
+      <App />
+    </LocaleProvider>
   </StrictMode>
 );

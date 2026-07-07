@@ -1,8 +1,11 @@
 import Modal from "@/components/Modal.tsx";
 import Text from "@/components/Text.tsx";
 import Form from "@/components/Form.tsx";
-import { type ReactNode, useEffect, useState } from "react";
-import { getGidSegment, type GidSegmentValue } from "@/lib/localDb";
+import {type ReactNode, useEffect, useState} from "react";
+import {getGidSegment, type GidSegmentValue} from "@/lib/localDb";
+import {getGIDFromSegmentObj} from "@/utils/Helpers.ts";
+import {useTranslation} from "@/i18n/useTranslation";
+
 
 type Segment = {
   key: string;
@@ -41,7 +44,7 @@ function OpenFormModalButton({
   const segmentName = `${segmentKey}_${value}`;
 
   useEffect(() => {
-    if (segmentKey !== "THM" && segmentKey !== "CONTRACTOR") {
+    if (segmentKey !== "THM" && segmentKey !== "CONTRACTOR" && segmentKey !== "GID") {
       return;
     }
 
@@ -61,24 +64,27 @@ function OpenFormModalButton({
     return <span className="color-noptis">{value}</span>;
   }
 
-  if (segmentKey !== "THM" && segmentKey !== "CONTRACTOR") {
+  if (segmentKey !== "THM" && segmentKey !== "CONTRACTOR" && segmentKey !== "GID") {
     return <span>{value}</span>;
   }
 
   const displayValue = savedValue ?? savedSegment?.value;
 
   return (
-    <button className={"font-bold"} onClick={() => onOpen(title, segmentName, value)}>
+    <button className={"text-sky-600"} onClick={() => onOpen(title, segmentName, value)}>
       <span>{value}</span>
       <span className={"text-sm"}>{displayValue ? ` (${displayValue})` : ""}</span>
     </button>
   );
 }
 
-function Table({ title, segments }: TableProps) {
+function Table({title, segments}: TableProps) {
+  const {t} = useTranslation();
   const [show, setShow] = useState(false);
   const [modalContent, setModalContent] = useState<ReactNode>(null);
   const [savedValues, setSavedValues] = useState<Record<string, string>>({});
+  const GID = getGIDFromSegmentObj(segments);
+  const GIDName = `GID_${GID}`;
 
   const openModal = (segment: Segment) => {
     setShow(true);
@@ -107,7 +113,6 @@ function Table({ title, segments }: TableProps) {
         segmentKey={segmentName}
         segmentValue={value}
         onSaved={(key, savedValue) => {
-
           setShow(false);
           setSavedValues((current) => ({
             ...current,
@@ -162,6 +167,21 @@ function Table({ title, segments }: TableProps) {
         })}
         </tbody>
       </table>
+
+      {GID && (
+        <div className={"mt-5 text-xl flex gap-2"}>
+          <strong>{t("GIDNumber")}:</strong>
+          <OpenFormModalButton
+            title={"GID"}
+            valid={GID.length === 16}
+            value={GID}
+            segmentKey={"GID"}
+            savedValue={savedValues[GIDName]}
+            onOpen={openFormModal}
+          />
+        </div>
+      )}
+
     </div>
   );
 }
