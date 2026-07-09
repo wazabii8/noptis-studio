@@ -28,6 +28,7 @@
   "save": "Save",
   "GIDPlaceholder": "Fill in GID number",
   "segmentPlaceholder": "What is this segment?",
+  "gidPlaceholder": "What is this GID number used for?",
 
   "prefix": "Prefix",
   "thmNumber": "TPA Number",

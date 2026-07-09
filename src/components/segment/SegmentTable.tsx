@@ -113,7 +113,7 @@ function SegmentTable({title, segments}: SegmentTableProps) {
 
       {GID && (
         <div className={"mt-5 text-xl flex gap-2"}>
-          <strong>{t("GIDNumber")}:</strong>
+          <strong className={"min-w-31"}>{t("GIDNumber")}:</strong>
           <SegmentValueButton
             title={"GID"}
             valid={GID.length === 16}

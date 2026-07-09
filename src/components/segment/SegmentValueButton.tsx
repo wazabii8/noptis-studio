@@ -47,9 +47,9 @@ function SegmentValueButton({title, value, valid, segmentKey, savedValue, onOpen
   const displayValue = savedValue ?? savedSegment?.value;
 
   return (
-    <button className={"text-sky-600"} onClick={() => onOpen(title, segmentName, value)}>
-      <span>{value}</span>
-      <span className={"text-sm"}>{displayValue ? ` (${displayValue})` : ""}</span>
+    <button className={"text-sky-600 flex flex-wrap gap-x-1 items-center"} onClick={() => onOpen(title, segmentName, value)}>
+      <span className={"inline-block"}>{value}</span>
+      <span className={"text-sm inline-block whitespace-pre-line"}>{displayValue ? ` (${displayValue})` : ""}</span>
     </button>
   );
 }

@@ -28,6 +28,8 @@
   "save": "Spara",
   "GIDPlaceholder": "Fyll i GID-nummer",
   "segmentPlaceholder": "Vad är detta segmentet?",
+  "gidPlaceholder": "Vad används detta GID-nummer till?",
+
 
   "prefix": "Prefix",
   "thmNumber": "TPA-nummer",
