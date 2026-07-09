@@ -19,15 +19,14 @@ type Segment = {
 
 function App() {
 
-  //const [lang, setLang] = useState<Locale>("en")
-  //9010123000000000
-  //9031123123412345
-  //9012123123410000
-
   const {lang, toggleLang} = useLocale();
   const [value, setValue] = useState('')
   const gidTypes = useMemo(() => createGidTypes(lang), [lang]);
 
+  /**
+   * Extracts the prefix,rReturns all GID type entries matching a given prefix,
+   * and lastly, Splits an input GID string into segments based on a type layout.
+   */
   const gidResult = useMemo(() => {
     const prefix = Helpers.getPrefixFromStr(value);
     const result = Helpers.getGidTypeFromPrefix(gidTypes, prefix);

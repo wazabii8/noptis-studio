@@ -1,12 +1,11 @@
 
-type Segment = {
+type TextProps = {
   title: string;
   description: string;
   dangerously: boolean;
 };
 
-function Text({ title, description, dangerously }: Segment) {
-
+function Text({ title, description, dangerously }: TextProps) {
 
   return (
     <div>

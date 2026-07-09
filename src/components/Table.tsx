@@ -1,11 +1,10 @@
 import Modal from "@/components/Modal.tsx";
 import Text from "@/components/Text.tsx";
 import Form from "@/components/Form.tsx";
-import {type ReactNode, useEffect, useState} from "react";
-import {getGidSegment, type GidSegmentValue} from "@/lib/localDb";
+import OpenFormModalButton from "@/components/OpenFormModalButton.tsx";
+import {type ReactNode, useState} from "react";
 import {getGIDFromSegmentObj} from "@/utils/Helpers.ts";
 import {useTranslation} from "@/i18n/useTranslation";
-
 
 type Segment = {
   key: string;
@@ -21,62 +20,6 @@ type TableProps = {
   title: string;
   segments: Segment[];
 };
-
-type ModalFormButtonProps = {
-  title: string;
-  value: string;
-  valid: boolean;
-  segmentKey: string;
-  savedValue?: string;
-  onOpen: (title: string, segmentName: string, value: string) => void;
-};
-
-function OpenFormModalButton({
-                               title,
-                               value,
-                               valid,
-                               segmentKey,
-                               savedValue,
-                               onOpen,
-                             }: ModalFormButtonProps) {
-  const [savedSegment, setSavedSegment] = useState<GidSegmentValue | undefined>();
-
-  const segmentName = `${segmentKey}_${value}`;
-
-  useEffect(() => {
-    if (segmentKey !== "THM" && segmentKey !== "CONTRACTOR" && segmentKey !== "GID") {
-      return;
-    }
-
-    if (!valid) {
-      return;
-    }
-
-    async function loadSavedSegment() {
-      const result = await getGidSegment(segmentName);
-      setSavedSegment(result);
-    }
-
-    void loadSavedSegment();
-  }, [valid, segmentName, segmentKey]);
-
-  if (!valid) {
-    return <span className="color-noptis">{value}</span>;
-  }
-
-  if (segmentKey !== "THM" && segmentKey !== "CONTRACTOR" && segmentKey !== "GID") {
-    return <span>{value}</span>;
-  }
-
-  const displayValue = savedValue ?? savedSegment?.value;
-
-  return (
-    <button className={"text-sky-600"} onClick={() => onOpen(title, segmentName, value)}>
-      <span>{value}</span>
-      <span className={"text-sm"}>{displayValue ? ` (${displayValue})` : ""}</span>
-    </button>
-  );
-}
 
 function Table({title, segments}: TableProps) {
   const {t} = useTranslation();
