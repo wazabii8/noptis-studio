@@ -1,8 +1,8 @@
 import {useEffect, useState} from "react";
-import {getGidSegment, type GidSegmentValue} from "@/lib/localDb";
+import {getGidSegment, type GidSegmentValue} from "@/lib/localDb.ts";
 
 
-type ModalFormButtonProps = {
+type SegmentValueButtonProps = {
   title: string;
   value: string;
   valid: boolean;
@@ -13,13 +13,13 @@ type ModalFormButtonProps = {
 
 const allowedSegmentKeys = ["THM", "CONTRACTOR", "GID"];
 
-function OpenFormModalButton({title, value, valid, segmentKey, savedValue, onOpen}: ModalFormButtonProps) {
+function SegmentValueButton({title, value, valid, segmentKey, savedValue, onOpen}: SegmentValueButtonProps) {
 
   const [savedSegment, setSavedSegment] = useState<GidSegmentValue | undefined>();
   const segmentName = `${segmentKey}_${value}`;
 
   useEffect(() => {
-    
+
     // Validate if the segment is valid and allowed
     if (!valid || !allowedSegmentKeys.includes(segmentKey)) {
       return;
@@ -54,4 +54,4 @@ function OpenFormModalButton({title, value, valid, segmentKey, savedValue, onOpe
   );
 }
 
-export default OpenFormModalButton;
+export default SegmentValueButton;

@@ -1,15 +1,15 @@
-import { saveGidSegment, getGidSegment } from "@/lib/localDb";
+import { saveGidSegment, getGidSegment } from "@/lib/localDb.ts";
 import { useEffect, useState } from "react";
-import {useTranslation} from "@/i18n/useTranslation";
+import {useTranslation} from "@/i18n/useTranslation.ts";
 
-type FormProps = {
+type SegmentFormProps = {
   title: string;
   segmentKey: string;
   segmentValue: string;
   onSaved?: (segmentKey: string, value: string) => void;
 };
 
-function Form({ title, segmentKey, segmentValue, onSaved }: FormProps) {
+function SegmentForm({ title, segmentKey, segmentValue, onSaved }: SegmentFormProps) {
   const {t} = useTranslation();
   const [value, setValue] = useState("");
 
@@ -50,4 +50,4 @@ function Form({ title, segmentKey, segmentValue, onSaved }: FormProps) {
   );
 }
 
-export default Form;
+export default SegmentForm;

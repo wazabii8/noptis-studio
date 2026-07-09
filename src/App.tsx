@@ -2,10 +2,9 @@ import {useMemo, useState} from 'react'
 import './App.css'
 import {createGidTypes} from "./segments/Segments.ts";
 import * as Helpers from "./utils/Helpers.ts";
-import Table from "@/components/Table.tsx";
+import SegmentTable from "@/components/segment/SegmentTable.tsx";
 import {t} from './i18n/locale'
 import {useLocale} from "@/i18n/LocaleContext";
-
 
 type Segment = {
   key: string;
@@ -24,7 +23,7 @@ function App() {
   const gidTypes = useMemo(() => createGidTypes(lang), [lang]);
 
   /**
-   * Extracts the prefix,rReturns all GID type entries matching a given prefix,
+   * Extracts the prefix, returns all GID type entries matching a given prefix,
    * and lastly, Splits an input GID string into segments based on a type layout.
    */
   const gidResult = useMemo(() => {
@@ -81,7 +80,7 @@ function App() {
             {gidResult && (
               <div>
                 <h2 className={"headline-4 mb-2"}>{gidResult.gidType.label}</h2>
-                <Table title={t(lang, "GIDSegmentDetails")} segments={gidResult.segmentedResult as Segment[]}></Table>
+                <SegmentTable title={t(lang, "GIDSegmentDetails")} segments={gidResult.segmentedResult as Segment[]}></SegmentTable>
               </div>
             )}
           </div>

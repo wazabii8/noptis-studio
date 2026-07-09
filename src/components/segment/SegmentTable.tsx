@@ -1,10 +1,10 @@
-import Modal from "@/components/Modal.tsx";
-import Text from "@/components/Text.tsx";
-import Form from "@/components/Form.tsx";
-import OpenFormModalButton from "@/components/OpenFormModalButton.tsx";
+import Modal from "@/components/ui/Modal.tsx";
+import Article from "@/components/ui/Article.tsx";
+import SegmentForm from "@/components/segment/SegmentForm.tsx";
+import SegmentValueButton from "@/components/segment/SegmentValueButton.tsx";
 import {type ReactNode, useState} from "react";
 import {getGIDFromSegmentObj} from "@/utils/Helpers.ts";
-import {useTranslation} from "@/i18n/useTranslation";
+import {useTranslation} from "@/i18n/useTranslation.ts";
 
 type Segment = {
   key: string;
@@ -16,12 +16,12 @@ type Segment = {
   isPadding: boolean;
 };
 
-type TableProps = {
+type SegmentTableProps = {
   title: string;
   segments: Segment[];
 };
 
-function Table({title, segments}: TableProps) {
+function SegmentTable({title, segments}: SegmentTableProps) {
   const {t} = useTranslation();
   const [show, setShow] = useState(false);
   const [modalContent, setModalContent] = useState<ReactNode>(null);
@@ -32,7 +32,7 @@ function Table({title, segments}: TableProps) {
   const openModal = (segment: Segment) => {
     setShow(true);
     setModalContent(
-      <Text
+      <Article
         title={segment.label}
         description={segment.description}
         dangerously={true}
@@ -51,7 +51,7 @@ function Table({title, segments}: TableProps) {
   ) => {
     setShow(true);
     setModalContent(
-      <Form
+      <SegmentForm
         title={title}
         segmentKey={segmentName}
         segmentValue={value}
@@ -96,7 +96,7 @@ function Table({title, segments}: TableProps) {
                     : `${segment.inpValue}->${segment.value}`
                 }
               >
-                <OpenFormModalButton
+                <SegmentValueButton
                   title={segment.label}
                   valid={segment.isValid}
                   value={segment.inpValue}
@@ -114,7 +114,7 @@ function Table({title, segments}: TableProps) {
       {GID && (
         <div className={"mt-5 text-xl flex gap-2"}>
           <strong>{t("GIDNumber")}:</strong>
-          <OpenFormModalButton
+          <SegmentValueButton
             title={"GID"}
             valid={GID.length === 16}
             value={GID}
@@ -129,4 +129,4 @@ function Table({title, segments}: TableProps) {
   );
 }
 
-export default Table;
+export default SegmentTable;
