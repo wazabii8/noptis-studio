@@ -1,10 +1,12 @@
-import {useMemo, useState} from 'react'
+import {type ReactNode, useMemo, useState} from 'react'
 import './App.css'
 import {createGidTypes} from "./segments/Segments.ts";
 import * as Helpers from "./utils/Helpers.ts";
 import SegmentTable from "@/components/segment/SegmentTable.tsx";
 import {t} from './i18n/locale'
 import {useLocale} from "@/i18n/LocaleContext";
+import Modal from "@/components/ui/Modal.tsx";
+import SegmentOverview from "@/components/segment/SegmentOverview.tsx";
 
 type Segment = {
   key: string;
@@ -21,6 +23,8 @@ function App() {
   const {lang, toggleLang} = useLocale();
   const [value, setValue] = useState('')
   const gidTypes = useMemo(() => createGidTypes(lang), [lang]);
+  //const [modalContent, setModalContent] = useState<ReactNode>(null);
+  const [show, setShow] = useState(false);
 
   /**
    * Extracts the prefix, returns all GID type entries matching a given prefix,
@@ -41,8 +45,18 @@ function App() {
     return {gidType, segmentedResult};
   }, [value, gidTypes, lang]);
 
+  const openGidOverview = () => {
+    setShow(true);
+  };
+
   return (
     <>
+      <Modal
+        title={"www"}
+        content={<SegmentOverview title={"www"} />}
+        open={show}
+        onClose={() => setShow(false)}
+      />
       <header id={"header"} className={"flex border-bottom"}>
         <figure id={"logo"} className={"mr-10"}>
           <svg xmlns="http://www.w3.org/2000/svg" width="200" height="42" fill="none" viewBox="0 0 218 46">
@@ -54,6 +68,7 @@ function App() {
                   d="M21.317 11.911c-5.357 1.707-8.473 7.902-6.526 12.936.78 1.936 1.948 3.097 3.896 4.259 1.948 1.161 4.285 1.161 6.233.378 1.957-.766 3.515-2.701 3.515-4.637-.39-1.162 0-2.324-.779-3.098-.78-.387-1.169-1.936-2.337-1.549.779 1.936 1.558 3.485.39 5.421-1.56 1.945-4.286 1.945-6.243 1.162-1.169-.775-1.558-1.936-2.337-3.098-.78-1.936-.78-3.872.39-5.808a9.2 9.2 0 0 1 3.506-3.097c1.168-.387 2.337-1.162 3.506-1.162 6.242-.387 11.306 5.808 10.137 12.003-.39 2.323-1.169 4.268-2.727 5.808q-1.753 2.334-4.675 3.493c-1.558.379-3.116 1.162-4.674 1.162-1.948-.387-3.896-.387-5.844-1.162a484 484 0 0 1-3.515-2.332c-1.948-1.936-3.506-3.872-4.285-6.582-.78-1.54-.39-3.097-.39-4.646-.39-4.646 1.559-8.905 5.454-11.616 5.454-3.097 11.696-3.872 17.15-.774 2.337 1.549 3.896 3.485 5.844 5.42.779 1.162 1.558 2.71 1.947 4.26-2.727-6.583-9.35-11.229-16.76-10.067-3.506.774-6.233 2.314-8.57 5.033q-1.753 2.324-2.338 4.646a20.9 20.9 0 0 0 0 6.97c.78 2.71 2.338 5.033 4.675 6.582 1.558.774 3.117 1.549 4.675 1.936h3.896c2.337-.387 4.285-1.549 5.843-3.098 2.727-2.323 2.727-6.195 2.338-9.3-.77-2.315-1.94-3.864-4.277-5.026-1.558-.774-3.116-1.161-5.064-.774-1.178.387-2.346.774-3.126 1.549-.779 1.161-1.948 2.323-1.948 3.872 0 .774.39 1.936.78 2.71 1.168 1.162 2.346 2.323 4.294 1.549-1.948-2.323-4.285-5.808 0-6.97 3.506-.774 7.012 1.936 7.012 5.421 0 1.549-.39 3.098-1.169 4.26-1.177 1.944-3.506 2.718-5.463 3.484-1.947.387-3.895 0-5.454-.774-1.558-.775-2.727-1.937-3.895-3.098-1.169-1.936-1.948-3.872-1.948-6.204 0-3.485 1.558-6.582 4.285-8.905 1.558-1.549 3.506-1.936 5.454-2.71 3.126-.388 6.242 0 8.97 1.161 6.622 3.494 9.738 12.012 6.622 18.99-1.558 3.485-4.285 6.195-7.402 7.744-4.675 1.936-10.518 1.936-15.202-.775-5.064-3.097-7.791-8.14-8.181-13.56 0-1.549.39-2.71.78-4.26-1.949 7.745 3.125 15.884 10.907 17.812 1.948.387 3.896.774 5.852.387 2.338-.388 4.286-1.162 6.233-2.323 2.338-1.936 3.896-4.26 5.065-6.979.779-1.936 1.169-3.871.779-5.807-.39-2.315-.78-4.638-2.727-6.574-2.337-1.936-4.675-3.872-7.756-3.986-1.576-.185-3.16-.053-4.816.343"/>
           </svg>
         </figure>
+        <button onClick={openGidOverview}>Test</button>
         <button className={"ml-auto p-2 rounded-2xl"} onClick={toggleLang}>{lang.toUpperCase()}</button>
       </header>
 
@@ -80,7 +95,8 @@ function App() {
             {gidResult && (
               <div>
                 <h2 className={"headline-4 mb-2"}>{gidResult.gidType.label}</h2>
-                <SegmentTable title={t(lang, "GIDSegmentDetails")} segments={gidResult.segmentedResult as Segment[]}></SegmentTable>
+                <SegmentTable title={t(lang, "GIDSegmentDetails")}
+                              segments={gidResult.segmentedResult as Segment[]}></SegmentTable>
               </div>
             )}
           </div>
