@@ -144,6 +144,114 @@
     border: 1px solid #CCC;
 }
 
+.seg-prefix,
+.seg-thm,
+.seg-contractor,
+.seg-zeros,
+.seg-line,
+.seg-journey,
+.seg-stop,
+.seg-local_pos,
+.seg-entrance,
+.seg-node,
+.seg-vehicle,
+.seg-block,
+.seg-duty,
+.seg-employee,
+.seg-case,
+.seg-zone_type,
+.seg-zone_no,
+.seg-place,
+.seg-equip,
+.seg-pad,
+.seg-virtual_vehicle_no {
+    color: #1d3045;
+    border-color: rgba(29, 48, 69, 0.12);
+}
+
+.seg-prefix {
+    background-color: #f4d7e1;
+}
+
+.seg-thm {
+    background-color: #d9e7f3;
+}
+
+.seg-contractor {
+    background-color: #d6e9e4;
+}
+
+.seg-pad {
+    background-color: #e2dcf2;
+}
+
+.seg-zeros {
+    background-color: #e8e8ec;
+}
+
+.seg-line {
+    background-color: #d8ebe7;
+}
+
+.seg-journey {
+    background-color: #f2e1cf;
+}
+
+.seg-stop {
+    background-color: #dce6f5;
+}
+
+.seg-local_pos {
+    background-color: #e4def3;
+}
+
+.seg-entrance {
+    background-color: #f0dce5;
+}
+
+.seg-node {
+    background-color: #d7e9ee;
+}
+
+.seg-vehicle {
+    background-color: #e1ead5;
+}
+
+.seg-block {
+    background-color: #f1e3d2;
+}
+
+.seg-duty {
+    background-color: #e5dcef;
+}
+
+.seg-employee {
+    background-color: #dce9df;
+}
+
+.seg-case {
+    background-color: #f0d7d7;
+}
+
+.seg-zone_type {
+    background-color: #d8e4ef;
+}
+
+.seg-zone_no {
+    background-color: #e7dfcf;
+}
+
+.seg-place {
+    background-color: #dbe7dc;
+}
+
+.seg-equip {
+    background-color: #e2ddec;
+}
+
+.seg-virtual_vehicle_no {
+    background-color: #ead8e2;
+}
 
 @media (prefers-color-scheme: light) {
     :root {
