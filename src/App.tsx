@@ -5,6 +5,8 @@ import * as Helpers from "./utils/Helpers.ts";
 import SegmentTable from "@/components/segment/SegmentTable.tsx";
 import {t} from './i18n/locale'
 import {useLocale} from "@/i18n/LocaleContext";
+import Modal from "@/components/ui/Modal.tsx";
+import SegmentOverview from "@/components/segment/SegmentOverview.tsx";
 
 type Segment = {
   key: string;
@@ -21,6 +23,8 @@ function App() {
   const {lang, toggleLang} = useLocale();
   const [value, setValue] = useState('')
   const gidTypes = useMemo(() => createGidTypes(lang), [lang]);
+  //const [modalContent, setModalContent] = useState<ReactNode>(null);
+  const [show, setShow] = useState(false);
 
   /**
    * Extracts the prefix, returns all GID type entries matching a given prefix,
@@ -41,8 +45,18 @@ function App() {
     return {gidType, segmentedResult};
   }, [value, gidTypes, lang]);
 
+  const openGidOverview = () => {
+    setShow(true);
+  };
+
   return (
     <>
+      <Modal
+        title={"GID Segment Overview"}
+        content={<SegmentOverview />}
+        open={show}
+        onClose={() => setShow(false)}
+      />
       <header id={"header"} className={"flex border-bottom"}>
         <figure id={"logo"} className={"mr-10"}>
           <svg xmlns="http://www.w3.org/2000/svg" width="200" height="42" fill="none" viewBox="0 0 218 46">
@@ -80,11 +94,15 @@ function App() {
             {gidResult && (
               <div>
                 <h2 className={"headline-4 mb-2"}>{gidResult.gidType.label}</h2>
-                <SegmentTable title={t(lang, "GIDSegmentDetails")} segments={gidResult.segmentedResult as Segment[]}></SegmentTable>
+                <SegmentTable title={t(lang, "GIDSegmentDetails")}
+                              segments={gidResult.segmentedResult as Segment[]}></SegmentTable>
               </div>
             )}
           </div>
         </div>
+        <button className={"gid-segment-button"} onClick={openGidOverview}>
+          <svg xmlns="http://www.w3.org/2000/svg" width="800" height="800" fill="none" viewBox="0 0 24 24"><path className={"path-grid"} fill="#A9113F" d="M8 6a2 2 0 1 1-4 0 2 2 0 0 1 4 0M8 12a2 2 0 1 1-4 0 2 2 0 0 1 4 0M6 20a2 2 0 1 0 0-4 2 2 0 0 0 0 4M14 6a2 2 0 1 1-4 0 2 2 0 0 1 4 0M12 14a2 2 0 1 0 0-4 2 2 0 0 0 0 4M14 18a2 2 0 1 1-4 0 2 2 0 0 1 4 0M18 8a2 2 0 1 0 0-4 2 2 0 0 0 0 4M20 12a2 2 0 1 1-4 0 2 2 0 0 1 4 0M18 20a2 2 0 1 0 0-4 2 2 0 0 0 0 4"/></svg>
+        </button>
       </main>
     </>
   )
