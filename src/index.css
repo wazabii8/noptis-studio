@@ -132,6 +132,31 @@
     }
 }
 
+.gid-segment-button {
+    width: 3.2rem;
+    height: 3.2rem;
+    background: #FFF;
+
+    @apply flex items-center justify-center overflow-hidden
+        rounded-full cursor-pointer fixed z-10 bottom-6 right-6;
+}
+
+.gid-segment-button, .path-grid {
+    @apply transition-colors;
+}
+
+.gid-segment-button svg {
+    width: 2.4rem;
+    height: 2.4rem;
+}
+
+.gid-segment-button:hover {
+    background: #A9113F;
+}
+.gid-segment-button:hover .path-grid {
+    fill: #FFF;
+}
+
 .color-noptis {
     color: #A9113F;
 }
@@ -167,91 +192,122 @@
 .seg-virtual_vehicle_no {
     color: #1d3045;
     border-color: rgba(29, 48, 69, 0.12);
+    text-align: center;
 }
 
 .seg-prefix {
-    background-color: #f4d7e1;
+    background-color: #C9145A;
+    color: #fff;
 }
 
 .seg-thm {
-    background-color: #d9e7f3;
+    background-color: #2F6FE4;
+    color: #fff;
 }
 
 .seg-contractor {
-    background-color: #d6e9e4;
+    background-color: #168C82;
+    color: #fff;
 }
 
 .seg-pad {
-    background-color: #e2dcf2;
+    background-color: #5965D8;
+    color: #fff;
 }
 
 .seg-zeros {
-    background-color: #e8e8ec;
+    background-color: #66758A;
+    color: #fff;
 }
 
 .seg-line {
-    background-color: #d8ebe7;
+    background-color: #D96828;
+    color: #fff;
 }
 
 .seg-journey {
-    background-color: #f2e1cf;
+    background-color: #1686A3;
+    color: #fff;
 }
 
 .seg-stop {
-    background-color: #dce6f5;
+    background-color: #D38A20;
+    color: #fff;
 }
 
 .seg-local_pos {
-    background-color: #e4def3;
+    background-color: #4775C9;
+    color: #fff;
 }
 
 .seg-entrance {
-    background-color: #f0dce5;
+    background-color: #D8296C;
+    color: #fff;
 }
 
 .seg-node {
-    background-color: #d7e9ee;
+    background-color: #247D77;
+    color: #fff;
 }
 
 .seg-vehicle {
-    background-color: #e1ead5;
+    background-color: #D9363E;
+    color: #fff;
 }
 
 .seg-block {
-    background-color: #f1e3d2;
+    background-color: #7650CE;
+    color: #fff;
 }
 
 .seg-duty {
-    background-color: #e5dcef;
+    background-color: #2476A8;
+    color: #fff;
 }
 
 .seg-employee {
-    background-color: #dce9df;
+    background-color: #B86B24;
+    color: #fff;
 }
 
 .seg-case {
-    background-color: #f0d7d7;
+    background-color: #C7274A;
+    color: #fff;
 }
 
 .seg-zone_type {
-    background-color: #d8e4ef;
+    background-color: #5853C9;
+    color: #fff;
 }
 
 .seg-zone_no {
-    background-color: #e7dfcf;
+    background-color: #287F93;
+    color: #fff;
 }
 
 .seg-place {
-    background-color: #dbe7dc;
+    background-color: #27854C;
+    color: #fff;
 }
 
 .seg-equip {
-    background-color: #e2ddec;
+    background-color: #9B3CAE;
+    color: #fff;
 }
 
 .seg-virtual_vehicle_no {
-    background-color: #ead8e2;
+    background-color: #B82E32;
+    color: #fff;
 }
+[class^="seg-"] {
+    font-weight: 600;
+    border: 1px solid rgba(255, 255, 255, 0.14);
+}
+
+[class^="seg-"]:hover {
+    filter: brightness(1.1);
+}
+
 
 @media (prefers-color-scheme: light) {
     :root {
