@@ -1,6 +1,6 @@
 import {createGidTypes, createSegments} from "@/segments/Segments.ts";
 import {useLocale} from "@/i18n/LocaleContext.tsx";
-
+import {Tooltip} from "@/components/ui/Tooltip.tsx";
 
 type GidTypes = ReturnType<typeof createGidTypes>;
 type Segments = ReturnType<typeof createSegments>;
@@ -31,11 +31,10 @@ function TableComp({data}: TableCompProps) {
 
   return Object.entries(data).map(([key, row]) => (
     <tr key={key}>
-      <td className={"min-w-40 text-sm text-slate-800"}>{row.label}</td>
+      <td className={"min-w-40 text-sm text-slate-800 border-0"}>{row.label}</td>
 
       {row.layout.flatMap((value, layoutIndex) => {
         const elemKey = (typeof value === "string" ? "seg-" + value : "seg-pad").toLowerCase();
-        const elemValue = (typeof value === "string" ? "" : "");
         const title =
           typeof value === "string"
             ? segments[value as keyof Segments].label
@@ -46,8 +45,12 @@ function TableComp({data}: TableCompProps) {
             : value.index.length;
 
         return Array.from({length}, (_, index) => (
-          <td key={`${layoutIndex}-${index}`} className={elemKey} title={title}>
-            {value === "PREFIX" ? getPrefixCharacter(index, row.prefix) : elemValue}
+          <td key={`${layoutIndex}-${index}`} className={elemKey}>
+            <Tooltip text={title}>
+              <span className={"p-2"}>
+                {value === "PREFIX" ? getPrefixCharacter(index, row.prefix) : "0"}
+              </span>
+            </Tooltip>
           </td>
         ));
       })}
@@ -66,7 +69,7 @@ function SegmentOverview() {
 
   return (
     <>
-      <table>
+      <table className={"mt-5 mb-5"}>
         <tbody>
           <TableComp data={segmentObj} />
         </tbody>
