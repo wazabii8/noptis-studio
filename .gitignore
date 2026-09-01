@@ -5,22 +5,31 @@ yarn-debug.log*
 yarn-error.log*
 pnpm-debug.log*
 lerna-debug.log*
+
 ._*
 .DS_Store
 .sass-cache
 .idea
 .env
 .smbdelete*
+
 .vscode/*
 !.vscode/extensions.json
-.idea
+
 *.suo
 *.ntvs*
 *.njsproj
 *.sln
 *.sw?
+
 vendor/
-node_modules
-dist
-dist-ssr
+node_modules/
+dist/
+dist-ssr/
 *.local
+
+# Tauri / Rust
+src-tauri/target/
+
+# Rust backup files
+**/*.rs.bk
