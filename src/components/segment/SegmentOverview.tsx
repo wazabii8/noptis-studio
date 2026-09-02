@@ -69,11 +69,13 @@ function SegmentOverview() {
 
   return (
     <>
-      <table className={"mt-5 mb-5"}>
-        <tbody>
-          <TableComp data={segmentObj} />
-        </tbody>
-      </table>
+      <div className={"overflow-x-auto"}>
+        <table className={"mt-5 mb-5"}>
+          <tbody>
+            <TableComp data={segmentObj} />
+          </tbody>
+        </table>
+      </div>
     </>
   );
 }
