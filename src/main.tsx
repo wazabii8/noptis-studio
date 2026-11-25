@@ -4,7 +4,7 @@ import "./index.css";
 import App from "./App.tsx";
 import { registerSW } from "virtual:pwa-register";
 import { requestPersistentStorage } from "./lib/persistentStorage";
-import { LocaleProvider } from "@/i18n/LocaleContext";
+import { LocaleProvider } from "@/i18n/LocaleProvider";
 import { registerGoatCounter } from "@/lib/analytics";
 
 registerGoatCounter();

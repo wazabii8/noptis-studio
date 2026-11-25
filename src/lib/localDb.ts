@@ -1,7 +1,7 @@
 import { openDB } from "idb";
 
 const DB_NAME = "noptis-studio";
-const DB_VERSION = 1;
+const DB_VERSION = 2;
 
 export type GidSegmentValue = {
   key: string;
@@ -10,11 +10,16 @@ export type GidSegmentValue = {
 };
 
 export const dbPromise = openDB(DB_NAME, DB_VERSION, {
-  upgrade(db) {
+  upgrade(db, oldVersion) {
     if (!db.objectStoreNames.contains("gidSegments")) {
       db.createObjectStore("gidSegments", {
         keyPath: "key",
       });
+    }
+    if (oldVersion < 2) {
+      db.createObjectStore("queryLists", {keyPath: "id", autoIncrement: true});
+      const queries = db.createObjectStore("queries", {keyPath: "id", autoIncrement: true});
+      queries.createIndex("listId", "listId");
     }
   },
 });
