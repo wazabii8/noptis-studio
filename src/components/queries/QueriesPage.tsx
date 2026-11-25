@@ -1,16 +1,22 @@
 import {useEffect, useState} from "react";
 import {useTranslation} from "@/i18n/useTranslation";
-import {createQueryList, getQueryLists, type ListFields, type QueryList} from "@/lib/queries";
+import {
+  createQueryList, deleteQueryList, editQueryList, getQueryLists, isBuiltInList,
+  type ListFields, type QueryList,
+} from "@/lib/queries";
 import QueryForm from "./QueryForm";
 import ListQueries from "./ListQueries";
+import ManageListForm from "./ManageListForm";
 
 export default function QueriesPage() {
   const {t} = useTranslation();
   const [lists, setLists] = useState<QueryList[]>([]);
   const [selectedId, setSelectedId] = useState<number>();
-  const [creating, setCreating] = useState(false);
+  const [mode, setMode] = useState<"browse" | "create" | "manage">("browse");
+  const [busy, setBusy] = useState(false);
   const [status, setStatus] = useState<"loading" | "ready" | "error">("loading");
   const selected = lists.find(list => list.id === selectedId);
+  const manageable = selected && !isBuiltInList(selected.id);
 
   useEffect(() => {
     let active = true;
@@ -24,10 +30,34 @@ export default function QueriesPage() {
   }, []);
 
   async function saveList({title, description}: ListFields) {
-    const list = await createQueryList({title, description});
-    setLists(current => [...current, list]);
-    setSelectedId(list.id);
-    setCreating(false);
+    setBusy(true);
+    try {
+      if (mode === "manage" && selected) {
+        const updated = {...selected, title, description};
+        await editQueryList(updated);
+        setLists(current => current.map(list => list.id === updated.id ? updated : list));
+      } else {
+        const list = await createQueryList({title, description});
+        setLists(current => [...current, list]);
+        setSelectedId(list.id);
+      }
+      setMode("browse");
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  async function removeList(id: number) {
+    setBusy(true);
+    try {
+      await deleteQueryList(id);
+      const remaining = lists.filter(list => list.id !== id);
+      setLists(remaining);
+      setSelectedId(remaining[0]?.id);
+      setMode("browse");
+    } finally {
+      setBusy(false);
+    }
   }
 
   return (
@@ -38,31 +68,33 @@ export default function QueriesPage() {
       </header>
       {status === "loading" && <p role="status">{t("loading")}</p>}
       {status === "error" && <p role="alert">{t("loadFailed")}</p>}
-      {status === "ready" && (
+      {status === "ready" && selected && (
         <>
-          {selected && (
-            <section className="mb-8">
-              <label htmlFor="query-list">{t("chooseList")}</label>
-              <div className="query-actions">
-                <div className="query-list-select">
-                  <select id="query-list" value={selected.id} onChange={e => {
-                    setSelectedId(Number(e.target.value));
-                    setCreating(false);
-                  }}>
-                    {lists.map(list => <option key={list.id} value={list.id}>{list.title}</option>)}
-                  </select>
-                </div>
-                <button className="query-secondary" onClick={() => setCreating(true)}>{t("newList")}</button>
+          <section className="mb-8">
+            <label htmlFor="query-list">{t("chooseList")}</label>
+            <div className="query-actions">
+              <div className="query-list-select">
+                <select id="query-list" value={selected.id} disabled={busy} onChange={e => {
+                  setSelectedId(Number(e.target.value));
+                  setMode("browse");
+                }}>
+                  {lists.map(list => <option key={list.id} value={list.id}>{list.title}</option>)}
+                </select>
               </div>
-              {selected.description && <p className="query-description mt-2">{selected.description}</p>}
-            </section>
-          )}
-          {creating ? (
-            <QueryForm kind="list" onSave={saveList} onCancel={() => setCreating(false)} />
-          ) : selected ? (
-            <ListQueries key={selected.id} listId={selected.id} />
+              <button className="query-secondary" disabled={busy} onClick={() => setMode("create")}>{t("newList")}</button>
+              {manageable && (
+                <button className="query-secondary" disabled={busy} onClick={() => setMode("manage")}>{t("manageList")}</button>
+              )}
+            </div>
+            {selected.description && <p className="query-description mt-2">{selected.description}</p>}
+          </section>
+          {mode === "create" ? (
+            <QueryForm kind="list" onSave={saveList} onCancel={() => setMode("browse")} />
+          ) : mode === "manage" && manageable ? (
+            <ManageListForm key={selected.id} list={selected} onSave={saveList} busy={busy}
+                            onCancel={() => setMode("browse")} onDelete={() => removeList(selected.id)} />
           ) : (
-            <button className="query-primary" onClick={() => setCreating(true)}>{t("firstList")}</button>
+            <ListQueries key={selected.id} listId={selected.id} />
           )}
         </>
       )}

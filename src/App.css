@@ -29,6 +29,7 @@
 
 .query-actions {
   gap: .65rem;
+  flex-wrap: wrap;
 }
 
 .query-list-select {
@@ -168,6 +169,10 @@
 }
 
 @media (max-width: 36rem) {
+  .query-list-select {
+    flex-basis: 100%;
+  }
+
   .studio-header {
     flex-wrap: wrap;
     gap: .5rem 1rem;
