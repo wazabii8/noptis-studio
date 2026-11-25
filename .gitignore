@@ -28,12 +28,6 @@ dist/
 dist-ssr/
 *.local
 
-# Tauri / Rust
-src-tauri/target/
-
-# Rust backup files
-**/*.rs.bk
-
 # Local agent documentation
 /AGENTS.md
 /docs/
