@@ -98,9 +98,9 @@ export default function SyncSettingsPage() {
   }
 
   return (
-    <main className="queries-page wrapper max-w-2xl card">
-      <header className="mb-8">
-        <h1 className="headline-2 mb-3">{t("syncTitle")}</h1>
+    <main className="studio-page queries-page">
+      <header className="studio-page-header">
+        <h1>{t("syncTitle")}</h1>
         <p>{t("syncIntro")}</p>
       </header>
       <section className="mb-8">

@@ -31,3 +31,7 @@ dist-ssr/
 # Local agent documentation
 /AGENTS.md
 /docs/
+
+# Local coding assistant configuration
+/.claude/
+/.codex/

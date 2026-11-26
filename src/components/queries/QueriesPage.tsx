@@ -8,6 +8,7 @@ import {
 import QueryForm from "./QueryForm";
 import ListQueries from "./ListQueries";
 import ManageListForm from "./ManageListForm";
+import {ChevronDownIcon, PencilIcon, PlusIcon} from "@/components/ui/Icons";
 
 export default function QueriesPage() {
   const {t} = useTranslation();
@@ -67,18 +68,18 @@ export default function QueriesPage() {
   }
 
   return (
-    <main className="queries-page wrapper max-w-2xl card">
-      <header className="mb-8">
-        <h1 className="headline-2 mb-3">{t("queriesTitle")}</h1>
+    <main className="studio-page queries-page">
+      <header className="studio-page-header">
+        <h1>{t("queriesTitle")}</h1>
         <p>{t("queriesIntro")}</p>
       </header>
       {status === "loading" && <p role="status">{t("loading")}</p>}
       {status === "error" && <p role="alert">{t("loadFailed")}</p>}
       {status === "ready" && selected && (
         <>
-          <section className="mb-8">
+          <section className="list-picker">
             <label htmlFor="query-list">{t("chooseList")}</label>
-            <div className="query-actions">
+            <div className="list-picker-controls">
               <div className="query-list-select">
                 <select id="query-list" value={selected.id} disabled={busy} onChange={e => {
                   setSelectedId(Number(e.target.value));
@@ -88,21 +89,32 @@ export default function QueriesPage() {
                 }}>
                   {visible.map(list => <option key={list.id} value={list.id}>{list.title}</option>)}
                 </select>
+                <ChevronDownIcon />
               </div>
-              <button className="query-secondary" disabled={busy || Boolean(queryDraftList)} onClick={() => setMode("create")}>{t("newList")}</button>
               {manageable && (
-                <button className="query-secondary" disabled={busy || Boolean(queryDraftList)} onClick={() => { setEditingList(selected); setSelectedId(selected.id); setMode("manage"); }}>{t("manageList")}</button>
+                <button type="button" className="btn btn-secondary btn-tall" disabled={busy || Boolean(queryDraftList)}
+                        onClick={() => { setEditingList(selected); setSelectedId(selected.id); setMode("manage"); }}>
+                  <PencilIcon />{t("manageList")}
+                </button>
               )}
+              <button type="button" className="btn btn-secondary btn-tall" disabled={busy || Boolean(queryDraftList)}
+                      onClick={() => setMode("create")}>
+                <PlusIcon />{t("newList")}
+              </button>
             </div>
-            {selected.description && <p className="query-description mt-2">{selected.description}</p>}
           </section>
           {mode === "create" ? (
-            <QueryForm kind="list" onSave={saveList} onCancel={() => setMode("browse")} />
+            <section className="studio-card form-card">
+              <QueryForm kind="list" onSave={saveList} onCancel={() => setMode("browse")} />
+            </section>
           ) : mode === "manage" && editingList ? (
-            <ManageListForm key={editingList.id} list={editingList} onSave={saveList} busy={busy}
-                            onCancel={() => { setEditingList(undefined); setMode("browse"); }} onDelete={count => removeList(editingList, count)} />
+            <section className="studio-card form-card">
+              <ManageListForm key={editingList.id} list={editingList} onSave={saveList} busy={busy}
+                              onCancel={() => { setEditingList(undefined); setMode("browse"); }}
+                              onDelete={count => removeList(editingList, count)} />
+            </section>
           ) : (
-            <ListQueries key={selected.id} listId={selected.id} onDraft={active => {
+            <ListQueries key={selected.id} list={selected} onDraft={active => {
               if (active) setSelectedId(selected.id);
               setQueryDraftList(active ? selected : undefined);
             }} />

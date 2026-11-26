@@ -53,7 +53,7 @@ function App() {
       <StudioHeader queriesOpen={queriesOpen} savedNumbersOpen={savedNumbersOpen} syncOpen={syncOpen} />
       {syncOpen && <SyncSettingsPage />}
       {queriesOpen && <QueriesPage />}
-      {savedNumbersOpen && <SavedNumbersPage />}
+      {savedNumbersOpen && <SavedNumbersPage onInspect={setValue} />}
       {!queriesOpen && !savedNumbersOpen && !syncOpen && (
         <main>
           <Modal

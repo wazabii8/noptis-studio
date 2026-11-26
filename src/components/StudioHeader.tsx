@@ -1,5 +1,6 @@
 import {useLocale} from "@/i18n/LocaleContext";
 import {t} from "@/i18n/locale";
+import {SyncIcon} from "@/components/ui/Icons";
 
 type StudioHeaderProps = {
   queriesOpen: boolean;
@@ -11,7 +12,7 @@ export default function StudioHeader({queriesOpen, savedNumbersOpen, syncOpen}: 
   const {lang, toggleLang} = useLocale();
   const syncTitle = t(lang, 'syncTitle');
   return (
-    <header id={"header"} className="studio-header border-bottom">
+    <header id={"header"} className="studio-header">
       <figure id={"logo"} aria-label="NOPTIS Studio">
         <svg xmlns="http://www.w3.org/2000/svg" width="200" height="42" fill="none" viewBox="0 0 218 46">
           <path className={"light:text-black dark:text-white"} fill="currentColor"
@@ -28,14 +29,11 @@ export default function StudioHeader({queriesOpen, savedNumbersOpen, syncOpen}: 
         <a href="#queries" aria-current={queriesOpen ? 'page' : undefined}>{t(lang, 'queriesTitle')}</a>
       </nav>
       <div className="studio-header-actions">
-        <a href="#sync" className="studio-sync" aria-label={syncTitle} title={syncTitle}
+        <a href="#sync" className="icon-btn" aria-label={syncTitle} title={syncTitle}
            aria-current={syncOpen ? 'page' : undefined}>
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-               strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-            <path d="M4 11a8 8 0 0 1 13.7-4.7L20 9m0-5v5h-5M20 13a8 8 0 0 1-13.7 4.7L4 15m0 5v-5h5" />
-          </svg>
+          <SyncIcon />
         </a>
-        <button type="button" className="studio-language p-2 rounded-2xl" onClick={toggleLang}>{lang.toUpperCase()}</button>
+        <button type="button" className="btn btn-secondary" onClick={toggleLang}>{lang.toUpperCase()}</button>
       </div>
     </header>
   );

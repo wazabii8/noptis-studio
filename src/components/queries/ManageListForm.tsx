@@ -48,20 +48,20 @@ export default function ManageListForm({list, onSave, onCancel, onDelete, busy}:
         <QueryForm kind="list" initial={list} onSave={onSave} onCancel={onCancel} onRequestDelete={requestDelete} />
       </fieldset>
       {count !== undefined && (
-        <section aria-labelledby="delete-list-prompt">
-          <p id="delete-list-prompt" className="query-description mb-2">
+        <section className="confirm-box" aria-labelledby="delete-list-prompt">
+          <p id="delete-list-prompt" className="confirm-box-text confirm-box-title">
             {t(confirmation).replace("{count}", String(count)).replace("{title}", () => list.title)}
           </p>
-          <div className="query-actions">
-            <button className="query-primary" disabled={busy} onClick={confirmDelete}>{t("deleteList")}</button>
-            <button className="query-secondary" disabled={busy} autoFocus onClick={() => {
+          <div className="form-actions">
+            <button type="button" className="btn btn-secondary" disabled={busy} autoFocus onClick={() => {
               setCount(undefined);
               setError(undefined);
             }}>{t("cancel")}</button>
+            <button type="button" className="btn btn-danger" disabled={busy} onClick={confirmDelete}>{t("deleteList")}</button>
           </div>
         </section>
       )}
-      {error && <p role="alert">{t(error)}</p>}
+      {error && <p className="form-error mt-3" role="alert">{t(error)}</p>}
     </>
   );
 }

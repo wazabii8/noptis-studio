@@ -9,11 +9,11 @@
   "newList": "Ny lista",
   "manageList": "Hantera lista",
   "savedNumbersTitle": "Sparade nummer",
-  "backToInspector": "Tillbaka till GID-inspektören",
+  "savedNumbersIntro": "Namn du ger GID, trafikhuvudmän och trafikoperatörer. De visas i GID-granskaren medan du skriver.",
   "savedGidNumbers": "GID-nummer",
   "savedTransportAuthorities": "Trafikhuvudmän (TPA)",
   "savedTransportOperators": "Trafikoperatörer (TPO)",
-  "noSavedNumbers": "Inga sparade nummer ännu.",
+  "noSavedNumbers": "Inga sparade nummer ännu. Lägg till ett här eller namnge det i GID-granskaren.",
   "add": "Lägg till",
   "organizationName": "Organisationsnamn",
   "invalidSavedGid": "Ange ett giltigt 16-siffrigt GID med ett känt prefix och rätt utfyllnad.",
@@ -151,5 +151,11 @@
   "syncNumberRecord": "Sparat nummer",
   "syncListRecord": "Frågelista",
   "syncQueryRecord": "Sparad fråga",
-  "staleRecord": "Posten ändrades efter att du öppnade formuläret. Utkastet finns kvar. Öppna posten igen för att se den senaste versionen."
+  "staleRecord": "Posten ändrades efter att du öppnade formuläret. Utkastet finns kvar. Öppna posten igen för att se den senaste versionen.",
+  "digitCount": "{length} siffror",
+  "openInInspector": "Öppna i GID-granskaren",
+  "noDescription": "Ingen beskrivning",
+  "noOrganizationName": "Inget organisationsnamn",
+  "confirmDeleteSavedNumberHint": "Det visas inte längre i GID-granskaren. Det går inte att ångra.",
+  "noQueries": "Inga frågor i listan ännu."
 }

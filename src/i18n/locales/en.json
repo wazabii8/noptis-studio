@@ -9,11 +9,11 @@
   "newList": "New list",
   "manageList": "Manage list",
   "savedNumbersTitle": "Saved numbers",
-  "backToInspector": "Back to inspector",
+  "savedNumbersIntro": "Names you give to GIDs, transport authorities and operators. They appear in the inspector as you type.",
   "savedGidNumbers": "GID numbers",
   "savedTransportAuthorities": "Transport authorities (TPA)",
   "savedTransportOperators": "Transport operators (TPO)",
-  "noSavedNumbers": "No numbers saved yet.",
+  "noSavedNumbers": "No numbers saved yet. Add one here or name it in the inspector.",
   "add": "Add",
   "organizationName": "Organization name",
   "invalidSavedGid": "Enter a valid 16-digit GID with a recognized prefix and correct padding.",
@@ -150,5 +150,11 @@
   "syncNumberRecord": "Saved number",
   "syncListRecord": "Query list",
   "syncQueryRecord": "Saved query",
-  "staleRecord": "This record changed after you opened the form. Your draft is still here. Reopen the record for its latest version."
+  "staleRecord": "This record changed after you opened the form. Your draft is still here. Reopen the record for its latest version.",
+  "digitCount": "{length} digits",
+  "openInInspector": "Open in inspector",
+  "noDescription": "No description",
+  "noOrganizationName": "No organization name",
+  "confirmDeleteSavedNumberHint": "It will no longer appear in the inspector. This can’t be undone.",
+  "noQueries": "No queries in this list yet."
 }

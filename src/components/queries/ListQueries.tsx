@@ -1,11 +1,18 @@
 import {useEffect, useState} from "react";
 import {useDbVersion} from "@/lib/dbChanges";
 import {useTranslation} from "@/i18n/useTranslation";
-import {addQuery, getListQueries, type QueryFields, type SavedQuery} from "@/lib/queries";
+import {addQuery, getListQueries, type QueryFields, type QueryList, type SavedQuery} from "@/lib/queries";
+import {PlusIcon} from "@/components/ui/Icons";
 import QueryForm from "./QueryForm";
 import QueryRow from "./QueryRow";
 
-export default function ListQueries({listId, onDraft}: {listId: number; onDraft: (active: boolean) => void}) {
+type Props = {
+  list: QueryList;
+  onDraft: (active: boolean) => void;
+};
+
+export default function ListQueries({list, onDraft}: Props) {
+  const listId = list.id;
   const {t} = useTranslation();
   const dbVersion = useDbVersion();
   const [drafts, setDrafts] = useState<SavedQuery[]>([]);
@@ -50,19 +57,32 @@ export default function ListQueries({listId, onDraft}: {listId: number; onDraft:
   if (failed) return <p role="alert">{t("loadFailed")}</p>;
 
   return (
-    <>
-      {adding ? (
-        <QueryForm kind="query" onSave={saveNew} onCancel={() => setFormOpen(false)} />
-      ) : (
-        <button className="query-primary" onClick={() => setFormOpen(true)}>{t("addQuery")}</button>
+    <section className="studio-card" aria-labelledby="query-list-heading">
+      <div className="studio-card-header">
+        <div className="studio-card-heading">
+          <h2 id="query-list-heading" className="studio-card-title">{list.title}</h2>
+          <span className="count-pill">{queries.length}</span>
+          {list.description && <p className="studio-card-description">{list.description}</p>}
+        </div>
+        <button type="button" className="btn btn-primary" disabled={adding} onClick={() => setFormOpen(true)}>
+          <PlusIcon />{t("addQuery")}
+        </button>
+      </div>
+      {adding && (
+        <div className="edit-panel">
+          <QueryForm kind="query" onSave={saveNew} onCancel={() => setFormOpen(false)} />
+        </div>
       )}
-      <ul className="mt-6">
-        {visible.map(query => (
-          <QueryRow key={query.id} query={query} onDraft={active => rowDraft(query, active)}
-                    onEdit={updated => setQueries(current => current.map(item => item.id === updated.id ? updated : item))}
-                    onDelete={() => setQueries(current => current.filter(item => item.id !== query.id))} />
-        ))}
-      </ul>
-    </>
+      {visible.length === 0 && !adding && <p className="studio-card-empty">{t("noQueries")}</p>}
+      {visible.length > 0 && (
+        <ul>
+          {visible.map(query => (
+            <QueryRow key={query.id} query={query} onDraft={active => rowDraft(query, active)}
+                      onEdit={updated => setQueries(current => current.map(item => item.id === updated.id ? updated : item))}
+                      onDelete={() => setQueries(current => current.filter(item => item.id !== query.id))} />
+          ))}
+        </ul>
+      )}
+    </section>
   );
 }

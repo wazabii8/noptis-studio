@@ -2,6 +2,7 @@ import {useId, useState, type FormEvent} from "react";
 import {StaleRecordError} from "@/lib/localDb";
 import {useTranslation} from "@/i18n/useTranslation";
 import {isBuiltInListTitle, type ListFields, type QueryFields} from "@/lib/queries";
+import {AlertIcon, TrashIcon} from "@/components/ui/Icons";
 
 type Props = {
   kind: "list" | "query";
@@ -41,31 +42,37 @@ export default function QueryForm({kind, initial, onSave, onCancel, onRequestDel
   return (
     <form onSubmit={submit}>
       <fieldset className="query-form" disabled={saving}>
-        <legend className="headline-4">{t(heading)}</legend>
-        <label htmlFor={id + "-title"}>{t("fieldTitle")}</label>
-        <input id={id + "-title"} autoFocus required value={title}
-               aria-invalid={reservedTitle || undefined} aria-describedby={reservedTitle ? id + "-title-error" : undefined}
-               onChange={e => setTitle(e.target.value)} />
-        {reservedTitle && <p id={id + "-title-error"}>{t("builtInListTitle")}</p>}
-        <label htmlFor={id + "-description"}>{t("description")}</label>
-        <textarea id={id + "-description"} rows={2} value={description} onChange={e => setDescription(e.target.value)} />
+        <legend>{t(heading)}</legend>
+        <div className="form-field">
+          <label htmlFor={id + "-title"}>{t("fieldTitle")}</label>
+          <input id={id + "-title"} autoFocus required value={title}
+                 aria-invalid={reservedTitle || undefined} aria-describedby={reservedTitle ? id + "-title-error" : undefined}
+                 onChange={e => setTitle(e.target.value)} />
+          {reservedTitle && <p id={id + "-title-error"} className="form-error"><AlertIcon />{t("builtInListTitle")}</p>}
+        </div>
+        <div className="form-field">
+          <label htmlFor={id + "-description"}>{t("description")}</label>
+          <textarea id={id + "-description"} rows={2} value={description} onChange={e => setDescription(e.target.value)} />
+        </div>
         {kind === "query" && (
-          <>
+          <div className="form-field">
             <label htmlFor={id + "-sql"}>SQL</label>
-            <textarea id={id + "-sql"} className="sql-input text-sm" required rows={7} wrap="off" spellCheck={false}
+            <textarea id={id + "-sql"} className="sql-input" required rows={7} wrap="off" spellCheck={false}
                       value={sql} onChange={e => setSql(e.target.value)} />
-          </>
+          </div>
         )}
-        {failure && <p role="alert">{t(failure)}</p>}
-        <div className="query-actions">
-          <button type="submit" className="query-primary" disabled={!valid}>
+        {failure && <p className="form-error" role="alert"><AlertIcon />{t(failure)}</p>}
+        <div className="form-actions">
+          <button type="submit" className="btn btn-primary" disabled={!valid}>
             {t(kind === "list" && initial ? "saveChanges" : "save")}
           </button>
-          <button type="button" className="query-secondary" onClick={onCancel}>{t("cancel")}</button>
+          <button type="button" className="btn btn-secondary" onClick={onCancel}>{t("cancel")}</button>
+          {onRequestDelete && (
+            <button type="button" className="btn btn-ghost form-actions-end" onClick={onRequestDelete}>
+              <TrashIcon />{t("deleteList")}
+            </button>
+          )}
         </div>
-        {onRequestDelete && (
-          <button type="button" className="query-secondary mt-6" onClick={onRequestDelete}>{t("deleteList")}</button>
-        )}
       </fieldset>
     </form>
   );

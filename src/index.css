@@ -98,18 +98,99 @@
 
 :root {
     --link-hover-color: #747bff;
+    --mono: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
     font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
     line-height: 1.5;
     font-weight: 400;
 
     color-scheme: light dark;
-    color: rgba(255, 255, 255, 0.87);
-    background-color: #242424;
+    color: var(--ink);
+    background-color: var(--ground);
 
     font-synthesis: none;
     text-rendering: optimizeLegibility;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
+}
+
+/* Colour tokens. Dark is the default scheme; the modal always renders on white. */
+:root {
+    --ground: #1a1c20;
+    --surface: #23262b;
+    --surface-2: #1f2226;
+    --pill: #2f333a;
+    --line: #33373e;
+    --row-line: #2e3238;
+    --line-strong: #4a505a;
+    --hover: rgba(255, 255, 255, .06);
+    --row-hover: rgba(255, 255, 255, .025);
+    --ink: #e8eaed;
+    --ink-2: #b6bcc5;
+    --ink-3: #9aa1ab;
+    --accent: #a9113f;
+    --accent-hover: #c0164a;
+    --accent-ink: #ff8fab;
+    --accent-tint: rgba(169, 17, 63, .24);
+    --accent-line: rgba(255, 143, 171, .4);
+    --focus-ring: rgba(255, 143, 171, .25);
+    --danger: #c8321f;
+    --danger-ink: #ff9d92;
+    --danger-tint: rgba(217, 58, 43, .14);
+    --danger-line: rgba(255, 157, 146, .35);
+    --success-ink: #6fd49a;
+    --success-tint: rgba(46, 160, 96, .16);
+    --success-line: rgba(111, 212, 154, .35);
+    --code-bg: #111820;
+}
+
+@media (prefers-color-scheme: light) {
+    :root {
+        --ground: #f5f6f8;
+        --surface: #ffffff;
+        --surface-2: #f8f9fb;
+        --pill: #eef0f3;
+        --line: #e4e7eb;
+        --row-line: #e9ecef;
+        --line-strong: #cfd4da;
+        --hover: #f0f2f4;
+        --row-hover: #fafbfc;
+        --ink: #18212d;
+        --ink-2: #4a5565;
+        --ink-3: #5f6874;
+        --accent: #a9113f;
+        --accent-hover: #8e1036;
+        --accent-ink: #a9113f;
+        --accent-tint: #fbeef2;
+        --accent-line: #e6bfcc;
+        --focus-ring: #f6d9e2;
+        --danger: #b42318;
+        --danger-ink: #b42318;
+        --danger-tint: #fff6f5;
+        --danger-line: #f1c7c0;
+        --success-ink: #146c43;
+        --success-tint: #ecf8f1;
+        --success-line: #b5e0c7;
+        --code-bg: #111820;
+    }
+}
+
+.modal-content {
+    --surface: #ffffff;
+    --surface-2: #f8f9fb;
+    --pill: #eef0f3;
+    --line-strong: #cfd4da;
+    --hover: #f0f2f4;
+    --ink: #18212d;
+    --ink-2: #4a5565;
+    --ink-3: #5f6874;
+    --accent-ink: #a9113f;
+    --accent-tint: #fbeef2;
+    --accent-line: #e6bfcc;
+    --focus-ring: #f6d9e2;
+    --danger: #b42318;
+    --danger-ink: #b42318;
+    --danger-tint: #fff6f5;
+    --danger-line: #f1c7c0;
 }
 
 
@@ -312,11 +393,6 @@
 
 
 @media (prefers-color-scheme: light) {
-    :root {
-        color: #213547;
-        background-color: #ffffff;
-    }
-
     .border-bottom {
         border-bottom: 1px solid #111;
     }
@@ -330,7 +406,3 @@
     }
 }
 
-.studio-header a:hover,
-.studio-language:hover {
-    color: var(--link-hover-color);
-}

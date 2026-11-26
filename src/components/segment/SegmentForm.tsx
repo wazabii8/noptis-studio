@@ -4,6 +4,7 @@ import {useLocale} from "@/i18n/LocaleContext";
 import {useTranslation} from "@/i18n/useTranslation";
 import {createSegments, savedNumberLabels, type SavedNumberKind} from "@/segments/Segments";
 import {isValidSavedNumber} from "@/utils/Helpers";
+import {AlertIcon, TrashIcon} from "@/components/ui/Icons";
 
 type SegmentFormProps = {
   kind: SavedNumberKind;
@@ -82,55 +83,67 @@ function SegmentForm({kind, number, initialText = "", editNumber = false, onSave
   };
 
   return (
-    <form className="segment-form" onSubmit={save}>
-      {editNumber ? (
-        <div className="mb-4">
-          <label htmlFor={numberId}>{numberLabel}</label>
-          <input
-            id={numberId}
-            type="text"
-            inputMode="numeric"
-            autoFocus
-            value={draftNumber}
-            disabled={busy || confirmingDelete}
-            aria-invalid={numberError || undefined}
-            aria-describedby={numberError ? `${numberId}-error` : undefined}
-            onChange={event => {
-              setDraftNumber(event.target.value);
-              if (numberError) setError(null);
-            }}
-          />
+    <form className="segment-form edit-panel" onSubmit={save}>
+      <div className={isGid ? "form-fields" : "form-fields form-fields-split"}>
+        {editNumber ? (
+          <div className="form-field">
+            <label htmlFor={numberId}>{numberLabel}</label>
+            <input
+              id={numberId}
+              className="number-input"
+              type="text"
+              inputMode="numeric"
+              autoFocus
+              value={draftNumber}
+              disabled={busy || confirmingDelete}
+              aria-invalid={numberError || undefined}
+              aria-describedby={numberError ? `${numberId}-error` : undefined}
+              onChange={event => {
+                setDraftNumber(event.target.value);
+                if (numberError) setError(null);
+              }}
+            />
+          </div>
+        ) : (
+          <p><strong>{numberLabel}</strong> <span className="number-input">{number}</span></p>
+        )}
+
+        <div className="form-field">
+          <label htmlFor={textId}>{t(isGid ? "description" : "organizationName")}</label>
+          {isGid ? <textarea {...textInput} rows={2} /> : <input {...textInput} type="text" />}
+          <p className="form-hint">{value.length} / {maxLength}</p>
         </div>
-      ) : (
-        <p className="mb-4"><strong>{numberLabel}</strong> {number}</p>
+      </div>
+
+      {errorMessage && (
+        <p id={`${numberId}-error`} className="form-error" role="alert"><AlertIcon />{errorMessage}</p>
       )}
-
-      <label htmlFor={textId}>{t(isGid ? "description" : "organizationName")}</label>
-      {isGid ? <textarea {...textInput} rows={3} /> : <input {...textInput} type="text" />}
-      <p className="segment-form-length">{value.length} / {maxLength}</p>
-
-      {confirmingDelete && <p className="mb-2">{t("confirmDeleteSavedNumber").replace("{number}", number)}</p>}
-      {errorMessage && <p id={`${numberId}-error`} className="mb-2" role="alert">{errorMessage}</p>}
-      <div className="query-actions">
-        {confirmingDelete ? (
-          <>
-            <button type="button" className="query-primary" disabled={busy} onClick={remove}>{t("delete")}</button>
-            <button type="button" className="query-secondary" disabled={busy} onClick={() => {
+      {confirmingDelete ? (
+        <div className="confirm-box">
+          <div className="confirm-box-text">
+            <p className="confirm-box-title">{t("confirmDeleteSavedNumber").replace("{number}", number)}</p>
+            <p className="confirm-box-hint">{t("confirmDeleteSavedNumberHint")}</p>
+          </div>
+          <div className="form-actions">
+            <button type="button" className="btn btn-secondary" disabled={busy} autoFocus onClick={() => {
               setConfirmingDelete(false);
               setError(null);
             }}>{t("cancel")}</button>
-          </>
-        ) : (
-          <>
-            <button type="submit" className="query-primary" disabled={busy}>{t("save")}</button>
-            <button type="button" className="query-secondary" disabled={busy} onClick={onCancel}>{t("cancel")}</button>
-            {onDelete && <button type="button" className="query-secondary" disabled={busy} onClick={() => {
+            <button type="button" className="btn btn-danger" disabled={busy} onClick={remove}>{t("delete")}</button>
+          </div>
+        </div>
+      ) : (
+        <div className="form-actions">
+          <button type="submit" className="btn btn-primary" disabled={busy}>{t("save")}</button>
+          <button type="button" className="btn btn-secondary" disabled={busy} onClick={onCancel}>{t("cancel")}</button>
+          {onDelete && (
+            <button type="button" className="btn btn-ghost form-actions-end" disabled={busy} onClick={() => {
               setConfirmingDelete(true);
               setError(null);
-            }}>{t("delete")}</button>}
-          </>
-        )}
-      </div>
+            }}><TrashIcon />{t("delete")}</button>
+          )}
+        </div>
+      )}
     </form>
   );
 }
