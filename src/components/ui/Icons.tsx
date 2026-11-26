@@ -54,3 +54,26 @@ export function AlertIcon(props: IconProps) {
 export function SyncIcon(props: IconProps) {
   return <StrokeIcon {...props}><path d="M4 11a8 8 0 0 1 13.7-4.7L20 9m0-5v5h-5M20 13a8 8 0 0 1-13.7 4.7L4 15m0 5v-5h5" /></StrokeIcon>;
 }
+
+export function XIcon(props: IconProps) {
+  return <StrokeIcon {...props} strokeWidth={2.2}><path d="M6 6l12 12M18 6 6 18" /></StrokeIcon>;
+}
+
+export function InfoIcon(props: IconProps) {
+  return <StrokeIcon {...props}><circle cx="12" cy="12" r="9" /><path d="M12 11v5M12 8v.01" /></StrokeIcon>;
+}
+
+export function ArrowRightIcon(props: IconProps) {
+  return <StrokeIcon {...props} strokeWidth={2.2}><path d="M5 12h14M13 6l6 6-6 6" /></StrokeIcon>;
+}
+
+/** Nine dots, the GID layouts symbol. Filled rather than stroked. */
+export function GridIcon({className}: IconProps) {
+  const dots = [6, 12, 18].flatMap(y => [6, 12, 18].map(x => ({x, y})));
+
+  return (
+    <svg className={className} viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+      {dots.map(({x, y}) => <circle key={`${x}-${y}`} cx={x} cy={y} r="1.8" />)}
+    </svg>
+  );
+}

@@ -140,3 +140,37 @@ export const createSegments = (locale: Locale) => ({
   EQUIP: { length: 9, label: t(locale, "equipmentNumber", "Equipment Number"), description: t(locale, "equipmentNumberDesc", "") },
   VIRTUAL_VEHICLE_NO: { length: 12, label: t(locale, "virtualVehicleNumber", "Virtual Vehicle Number"), description: t(locale, "virtualVehicleNumberDesc", "") },
 });
+
+export type SegmentKey = keyof ReturnType<typeof createSegments>;
+
+/**
+ * Colour for each GID segment, shared by the inspector strip, result rows and the GID layouts dialog.
+ * PADDING is the fixed-digit part of a layout, such as the zeros after a TPA.
+ */
+export const segmentColors = {
+  PREFIX: "#C9145A",
+  THM: "#2F6FE4",
+  CONTRACTOR: "#168C82",
+  ZEROS: "#66758A",
+  LINE: "#D96828",
+  JOURNEY: "#1686A3",
+  STOP: "#D38A20",
+  LOCAL_POS: "#4775C9",
+  ENTRANCE: "#D8296C",
+  NODE: "#247D77",
+  VEHICLE: "#D9363E",
+  BLOCK: "#7650CE",
+  DUTY: "#2476A8",
+  EMPLOYEE: "#B86B24",
+  CASE: "#C7274A",
+  ZONE_TYPE: "#5853C9",
+  ZONE_NO: "#287F93",
+  PLACE: "#27854C",
+  EQUIP: "#9B3CAE",
+  VIRTUAL_VEHICLE_NO: "#B82E32",
+  PADDING: "#66758A",
+} as const satisfies Record<SegmentKey | "PADDING", string>;
+
+export function getSegmentColor(key: string) {
+  return Object.hasOwn(segmentColors, key) ? segmentColors[key as keyof typeof segmentColors] : segmentColors.PADDING;
+}

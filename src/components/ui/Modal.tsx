@@ -1,46 +1,58 @@
-import { type ReactNode } from "react";
+import {type ReactNode, useEffect, useId} from "react";
+import {XIcon} from "@/components/ui/Icons";
 
 type ModalProps = {
   title: string;
+  description?: string;
   content: ReactNode;
   open: boolean;
   onClose: () => void;
+  /** Widens the dialog for content such as the GID layouts grid. */
+  wide?: boolean;
 };
 
-function Modal({ title, content, open, onClose }: ModalProps) {
+function Modal({title, description, content, open, onClose, wide = false}: ModalProps) {
+  const titleId = useId();
+
+  useEffect(() => {
+    if (!open) return;
+
+    function closeOnEscape(event: KeyboardEvent) {
+      if (event.key === "Escape") onClose();
+    }
+
+    window.addEventListener("keydown", closeOnEscape);
+    return () => window.removeEventListener("keydown", closeOnEscape);
+  }, [open, onClose]);
+
   if (!open) {
     return null;
   }
 
   return (
-    <div className="modal fixed inset-0 z-50 flex items-center justify-center p-6">
-      <div
-        className="absolute inset-0 bg-black/60 backdrop-blur-sm"
-        onClick={onClose}
-      />
+    <div className="modal fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6">
+      <div className="absolute inset-0 bg-slate-950/60 backdrop-blur-sm" onClick={onClose} />
 
-      <div className="relative z-10 flex max-h-[calc(100vh-3rem)] w-full max-w-3xl flex-col overflow-hidden rounded-2xl bg-white text-zinc-900 shadow-2xl">
-        <div className="flex items-center justify-between border-b border-zinc-200 px-8 py-5">
-          <div>
-            <p className="text-sm font-medium uppercase tracking-wide text-zinc-500">
-              {title}
-            </p>
+      <section
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby={titleId}
+        className={`modal-dialog relative z-10 flex max-h-[calc(100vh-2rem)] w-full flex-col overflow-hidden ${wide ? "max-w-[56.25rem]" : "max-w-3xl"}`}
+      >
+        <header className="modal-header">
+          <div className="min-w-0 flex-1">
+            <h2 id={titleId} className="modal-title">{title}</h2>
+            {description && <p className="modal-description">{description}</p>}
           </div>
-
-          <button
-            type="button"
-            onClick={onClose}
-            className="rounded-full p-2 text-zinc-500 transition hover:text-zinc-900"
-            aria-label="Close modal"
-          >
-            ✕
+          <button type="button" onClick={onClose} className="icon-btn" aria-label="Close modal" title="Close">
+            <XIcon />
           </button>
-        </div>
+        </header>
 
-        <div className="modal-content overflow-y-auto px-8 py-7">
-            {content}
+        <div className="modal-content overflow-y-auto">
+          {content}
         </div>
-      </div>
+      </section>
     </div>
   );
 }
