@@ -1,6 +1,6 @@
 # NOPTIS Studio
 
-![NOPTIS Studio - Inspect NOPTIS GIDs instantly](https://wazabii.se/github-assets/noptis-studio/hero.png)
+![NOPTIS Studio - Inspect NOPTIS GIDs instantly](https://wazabii.se/github-assets/noptis-studio/hero-v2.png)
 
 **Turn NOPTIS GIDs into something you can actually read.**
 
