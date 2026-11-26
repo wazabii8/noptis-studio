@@ -135,8 +135,6 @@
   "syncSwitchAccount": "Copy local records to this account",
   "syncRemoteIncomplete": "A cloud record is missing or uses an unsupported format. Sync will retry. Local data is available.",
   "syncUnsupported": "This storage does not provide the revision checks required for safe sync.",
-  "syncPending": "Pending changes: {count}",
-  "syncLast": "Last confirmed sync: {time}",
   "syncConflicts": "Conflicts",
   "syncConflictIntro": "Choose which version to keep for each record.",
   "syncKeepLocal": "Keep local version",
@@ -201,5 +199,15 @@
   "positionRange": "positions {start}–{end}",
   "digitCountOne": "1 digit",
   "noLayoutMatch": "No layout matches “{query}”. Try a type such as Vehicle or a prefix such as 9031.",
-  "layoutsFootnote": "· means any digit. Prefix and padding digits are shown exactly as they must be entered."
+  "layoutsFootnote": "· means any digit. Prefix and padding digits are shown exactly as they must be entered.",
+  "syncStorageTitle": "Remote storage",
+  "syncLocalOnly": "Everything stays on this device until you connect.",
+  "syncNotConnected": "Not connected",
+  "syncOfflineShort": "Offline",
+  "syncOtherWindowShort": "Managed elsewhere",
+  "syncPendingLabel": "Pending changes",
+  "syncLastLabel": "Last confirmed sync",
+  "syncWhatSyncs": "What syncs",
+  "syncQueryLists": "Query lists",
+  "syncSqlQueries": "SQL queries"
 }

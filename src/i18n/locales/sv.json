@@ -136,8 +136,6 @@
   "syncSwitchAccount": "Kopiera lokala poster till det här kontot",
   "syncRemoteIncomplete": "En molnpost saknas eller använder ett format som inte stöds. Synkroniseringen försöker igen. Lokala data finns kvar.",
   "syncUnsupported": "Den här lagringen tillhandahåller inte versionskontrollerna som krävs för säker synkronisering.",
-  "syncPending": "Väntande ändringar: {count}",
-  "syncLast": "Senast bekräftade synkronisering: {time}",
   "syncConflicts": "Konflikter",
   "syncConflictIntro": "Välj vilken version du vill behålla för varje post.",
   "syncKeepLocal": "Behåll lokal version",
@@ -202,5 +200,15 @@
   "positionRange": "positioner {start}–{end}",
   "digitCountOne": "1 siffra",
   "noLayoutMatch": "Ingen layout matchar ”{query}”. Prova en typ som Fordon eller ett prefix som 9031.",
-  "layoutsFootnote": "· betyder valfri siffra. Prefix- och utfyllnadssiffror visas precis som de ska skrivas."
+  "layoutsFootnote": "· betyder valfri siffra. Prefix- och utfyllnadssiffror visas precis som de ska skrivas.",
+  "syncStorageTitle": "Remote storage",
+  "syncLocalOnly": "Allt stannar på den här enheten tills du ansluter.",
+  "syncNotConnected": "Inte ansluten",
+  "syncOfflineShort": "Offline",
+  "syncOtherWindowShort": "Hanteras på annat ställe",
+  "syncPendingLabel": "Väntande ändringar",
+  "syncLastLabel": "Senast bekräftade synkronisering",
+  "syncWhatSyncs": "Det här synkas",
+  "syncQueryLists": "Frågelistor",
+  "syncSqlQueries": "SQL-frågor"
 }

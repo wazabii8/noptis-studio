@@ -294,16 +294,16 @@ test("production preview migrates local records and safely syncs two independent
   await first.page.getByRole("link", {name: "GID", exact: true}).click();
   const gid = first.page.locator("#inp-gid");
   await gid.fill("9031123123412345");
-  assert.deepEqual((await first.page.locator("table td").allTextContents()).map(value => value.trim()),
+  assert.deepEqual((await first.page.locator(".segment-value").allTextContents()).map(value => value.trim()),
     ["9031", "123", "1234", "12345"]);
   await gid.fill("903112312341234");
-  assert.ok(await first.page.locator("table td.error").count());
+  assert.ok(await first.page.locator(".segment-row.is-invalid").count());
   await gid.fill("9999123123412345");
-  assert.equal(await first.page.locator("table").count(), 0);
+  assert.equal(await first.page.locator("#gid-type-heading").count(), 0);
   await gid.fill("9031123123412345");
   await button(first.page, "EN").click();
   await first.page.getByRole("link", {name: "Synkronisering", exact: true}).waitFor();
-  assert.equal((await first.page.locator("table td").allTextContents()).map(value => value.trim()).join(" "),
+  assert.equal((await first.page.locator(".segment-value").allTextContents()).map(value => value.trim()).join(" "),
     "9031 123 1234 12345");
 });
 

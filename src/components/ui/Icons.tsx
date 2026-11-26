@@ -77,3 +77,31 @@ export function GridIcon({className}: IconProps) {
     </svg>
   );
 }
+
+export function CloudIcon(props: IconProps) {
+  return <StrokeIcon {...props}><path d="M7 18a4.5 4.5 0 0 1-.5-8.97A6 6 0 0 1 18 8.5a4.25 4.25 0 0 1-.5 9.5z" /></StrokeIcon>;
+}
+
+export function CloudCheckIcon(props: IconProps) {
+  return (
+    <StrokeIcon {...props}>
+      <path d="M7 18a4.5 4.5 0 0 1-.5-8.97A6 6 0 0 1 18 8.5a4.25 4.25 0 0 1-.5 9.5z" /><path d="m9.5 13 2 2 3.5-3.5" />
+    </StrokeIcon>
+  );
+}
+
+export function LogOutIcon(props: IconProps) {
+  return <StrokeIcon {...props}><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4M10 17l-5-5 5-5M5 12h11" /></StrokeIcon>;
+}
+
+export function HashIcon(props: IconProps) {
+  return <StrokeIcon {...props}><path d="M5 9h14M5 15h14M10 4 8 20M16 4l-2 16" /></StrokeIcon>;
+}
+
+export function ListIcon(props: IconProps) {
+  return <StrokeIcon {...props}><path d="M8 6h12M8 12h12M8 18h12M4 6h.01M4 12h.01M4 18h.01" /></StrokeIcon>;
+}
+
+export function CodeIcon(props: IconProps) {
+  return <StrokeIcon {...props}><path d="m8 8-4 4 4 4M16 8l4 4-4 4" /></StrokeIcon>;
+}

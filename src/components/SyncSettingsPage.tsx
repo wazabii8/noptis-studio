@@ -13,10 +13,19 @@ import {
   accountAddress, confirmSyncAccount, connectSync, disconnectSync,
   getSyncStatus, subscribeSyncStatus, syncNow,
 } from "@/lib/synchronization";
+import {
+  AlertIcon, ChevronDownIcon, CloudCheckIcon, CloudIcon, CodeIcon, HashIcon, ListIcon, LogOutIcon, SyncIcon,
+} from "@/components/ui/Icons";
 
+// Short label for the status pill. Offline and another-window phases also show their full sentence below it.
 const phases = {
   connecting: "syncConnecting", ready: "syncReady",
-  syncing: "syncSyncing", offline: "syncOffline", error: "syncError", otherWindow: "syncOtherWindow",
+  syncing: "syncSyncing", offline: "syncOfflineShort", error: "syncError", otherWindow: "syncOtherWindowShort",
+} as const;
+const phaseNotices = {offline: "syncOffline", otherWindow: "syncOtherWindow"} as const;
+const phaseTones = {
+  off: "neutral", connecting: "neutral", ready: "ok", syncing: "neutral",
+  offline: "neutral", error: "bad", otherWindow: "neutral",
 } as const;
 const recordLabels = {number: "syncNumberRecord", list: "syncListRecord", query: "syncQueryRecord"} as const;
 
@@ -27,8 +36,8 @@ function RecordVersion({document}: {document: SyncDocument}) {
   if ("value" in data) return <p className="whitespace-pre-wrap wrap-anywhere">{data.value}</p>;
   return (
     <>
-      <p className="wrap-anywhere"><strong>{data.title}</strong></p>
-      <p className="query-description whitespace-pre-wrap">{data.description}</p>
+      <p className="sync-record-title">{data.title}</p>
+      {data.description && <p className="sync-record-description">{data.description}</p>}
       {"sql" in data && <pre className="overflow-x-auto"><code>{data.sql}</code></pre>}
     </>
   );
@@ -41,13 +50,16 @@ function RecoverQuery({record, lists, busy, recover}: {
   const [target, setTarget] = useState<number>();
   const listId = lists.some(list => list.id === target) ? target : lists[0]?.id;
   return (
-    <li className="query-row">
+    <li className="sync-item">
       <RecordVersion document={record.desired} />
-      <div className="query-actions">
-        <select aria-label={t("chooseList")} value={listId ?? ""} onChange={event => setTarget(Number(event.target.value))}>
-          {lists.map(list => <option key={list.id} value={list.id}>{list.title}</option>)}
-        </select>
-        <button className="query-secondary" disabled={busy || listId === undefined}
+      <div className="sync-recover-controls">
+        <div className="query-list-select">
+          <select aria-label={t("chooseList")} value={listId ?? ""} onChange={event => setTarget(Number(event.target.value))}>
+            {lists.map(list => <option key={list.id} value={list.id}>{list.title}</option>)}
+          </select>
+          <ChevronDownIcon />
+        </div>
+        <button type="button" className="btn btn-secondary btn-tall" disabled={busy || listId === undefined}
                 onClick={() => { if (listId !== undefined) recover(listId); }}>{t("syncRecover")}</button>
       </div>
     </li>
@@ -97,102 +109,173 @@ export default function SyncSettingsPage() {
     finally { setBusy(false); }
   }
 
+  const tone = phaseTones[status.phase];
+  const notice = status.phase === "offline" || status.phase === "otherWindow" ? phaseNotices[status.phase] : undefined;
+  const showSyncNow = status.phase === "ready" || status.phase === "syncing" || status.phase === "offline" ||
+    (status.phase === "error" && Boolean(status.address) && ["syncFailed", "syncRemoteIncomplete"].includes(status.issue ?? ""));
+
   return (
     <main className="studio-page queries-page">
       <header className="studio-page-header">
         <h1>{t("syncTitle")}</h1>
         <p>{t("syncIntro")}</p>
       </header>
-      <section className="mb-8">
-        {status.phase !== "off" && (
-          <div role="status" className="mb-4">
-            <p><strong>{t(phases[status.phase])}</strong>{status.address && <> · {status.address}</>}</p>
-            {status.issue && <p>{t(status.issue)}</p>}
-            {showSyncDetails && settings?.account && <p>{t("syncPending").replace("{count}", String(pending))}</p>}
-            {showSyncDetails && settings?.lastSync && <p>{t("syncLast").replace("{time}", new Date(settings.lastSync).toLocaleString(lang))}</p>}
+
+      <section className="studio-card" aria-labelledby="sync-account-heading">
+        <div className="sync-account" role={status.phase !== "off" ? "status" : undefined}>
+          <div className="sync-account-header">
+            <span className={`sync-tile is-${tone}`} aria-hidden="true">
+              {status.phase === "ready" ? <CloudCheckIcon /> : <CloudIcon />}
+            </span>
+            <div className="sync-account-text">
+              <h2 id="sync-account-heading" className="studio-card-title">{t("syncStorageTitle")}</h2>
+              {status.phase !== "off" && status.address
+                ? <p className="sync-account-address">{status.address}</p>
+                : <p className="sync-account-hint">{t("syncLocalOnly")}</p>}
+            </div>
+            <span className={`status-pill is-${tone}`}>
+              <span className="sync-dot" aria-hidden="true" />
+              {status.phase === "off" ? t("syncNotConnected") : t(phases[status.phase])}
+            </span>
           </div>
-        )}
+          {(notice || status.issue) && (
+            <div className={status.issue ? "sync-notice is-bad" : "sync-notice"}>
+              <AlertIcon />
+              <div>
+                {notice && <p>{t(notice)}</p>}
+                {status.issue && <p>{t(status.issue)}</p>}
+              </div>
+            </div>
+          )}
+          {showSyncDetails && settings?.account && (
+            <dl className="sync-stats">
+              <div className="sync-stat">
+                <dt>{t("syncPendingLabel")}<span className="sr-only">: </span></dt>
+                <dd>{pending}</dd>
+              </div>
+              {settings.lastSync && (
+                <div className="sync-stat">
+                  <dt>{t("syncLastLabel")}<span className="sr-only">: </span></dt>
+                  <dd>{new Date(settings.lastSync).toLocaleString(lang)}</dd>
+                </div>
+              )}
+            </dl>
+          )}
+        </div>
+
         {showConnect && (
-          <form className="query-form" onSubmit={event => {
+          <form className="sync-connect" onSubmit={event => {
             event.preventDefault();
             void perform(() => connectSync(address.trim(), differentAccount && switchAccount));
           }}>
             <label htmlFor="sync-address">{t("syncAddress")}</label>
-            <input id="sync-address" value={address} placeholder="user@example.com" required
-                   pattern={String.raw`[^@\s]+@[^@\s]+`} autoCapitalize="none" autoComplete="off" spellCheck={false}
-                   disabled={controlsDisabled || connected} onChange={event => {
-                     setInput(event.target.value);
-                     setSwitchAccount(false);
-                   }} />
-            <a className="inline-block mt-1 text-sm underline" href="https://5apps.com/users/sign_up?site=storage">
-              {t("syncSignUp")}
-            </a>
+            <div className="sync-connect-row">
+              <input id="sync-address" value={address} placeholder="user@example.com" required
+                     pattern={String.raw`[^@\s]+@[^@\s]+`} autoCapitalize="none" autoComplete="off" spellCheck={false}
+                     disabled={controlsDisabled || connected} onChange={event => {
+                       setInput(event.target.value);
+                       setSwitchAccount(false);
+                     }} />
+              <button type="submit" className="btn btn-primary sync-connect-button"
+                      disabled={controlsDisabled || (differentAccount && !switchAccount)}>
+                {t(previousAddress && !differentAccount ? "syncReconnectButton" : "syncConnect")}
+              </button>
+            </div>
             {differentAccount && !connected && (
-              <label className="flex items-center gap-2">
-                <input type="checkbox" className="w-auto" checked={switchAccount} disabled={controlsDisabled}
+              <label className="sync-checkbox">
+                <input type="checkbox" checked={switchAccount} disabled={controlsDisabled}
                        onChange={event => setSwitchAccount(event.target.checked)} />
                 {t("syncSwitchAccount")}
               </label>
             )}
-            <div className="query-actions">
-              <button type="submit" className="query-primary" disabled={controlsDisabled || (differentAccount && !switchAccount)}>
-                {t(previousAddress && !differentAccount ? "syncReconnectButton" : "syncConnect")}
-              </button>
-            </div>
+            <a className="text-link sync-sign-up" href="https://5apps.com/users/sign_up?site=storage">
+              {t("syncSignUp")}
+            </a>
           </form>
         )}
-        {connected && (
-          <div className="query-actions mt-3">
-            {status.canSwitch && <button className="query-primary" disabled={controlsDisabled}
-              onClick={() => void perform(confirmSyncAccount)}>{t("syncSwitchAccount")}</button>}
-            {(status.phase === "ready" || status.phase === "syncing" || status.phase === "offline" ||
-              (status.phase === "error" && status.address && ["syncFailed", "syncRemoteIncomplete"].includes(status.issue ?? ""))) &&
-              <button className="query-primary" disabled={controlsDisabled || status.phase === "syncing"}
-                      onClick={() => void perform(syncNow)}>{t("syncNow")}</button>}
-            <button className="query-secondary" disabled={controlsDisabled}
-                    onClick={() => void perform(async () => {
-                      await disconnectSync();
-                      setInput(undefined);
-                      setSwitchAccount(false);
-                    })}>{t("syncDisconnect")}</button>
+
+        {(connected || status.phase === "connecting") && (
+          <div className="sync-actions">
+            {connected && status.canSwitch && (
+              <button type="button" className="btn btn-primary" disabled={controlsDisabled}
+                      onClick={() => void perform(confirmSyncAccount)}>{t("syncSwitchAccount")}</button>
+            )}
+            {connected && showSyncNow && (
+              <button type="button" className="btn btn-primary" disabled={controlsDisabled || status.phase === "syncing"}
+                      onClick={() => void perform(syncNow)}>
+                <SyncIcon />{t("syncNow")}
+              </button>
+            )}
+            {connected && (
+              <button type="button" className="btn btn-ghost form-actions-end" disabled={controlsDisabled}
+                      onClick={() => void perform(async () => {
+                        await disconnectSync();
+                        setInput(undefined);
+                        setSwitchAccount(false);
+                      })}>
+                <LogOutIcon />{t("syncDisconnect")}
+              </button>
+            )}
+            {status.phase === "connecting" && (
+              <button type="button" className="btn btn-secondary" disabled={busy}
+                      onClick={() => void perform(disconnectSync)}>{t("cancel")}</button>
+            )}
           </div>
         )}
-        {status.phase === "connecting" && (
-          <button className="query-secondary mt-3" disabled={busy}
-                  onClick={() => void perform(disconnectSync)}>{t("cancel")}</button>
+
+        {failed && <p className="sync-notice is-bad" role="alert"><AlertIcon />{t("syncFailed")}</p>}
+
+        {!connected && (
+          <div className="sync-includes">
+            <span className="sync-includes-label">{t("syncWhatSyncs")}</span>
+            <span><HashIcon />{t("savedNumbersTitle")}</span>
+            <span><ListIcon />{t("syncQueryLists")}</span>
+            <span><CodeIcon />{t("syncSqlQueries")}</span>
+          </div>
         )}
-        {failed && <p role="alert">{t("syncFailed")}</p>}
       </section>
+
       {conflicts.length > 0 && (
-        <section className="mb-8">
-          <h2 className="headline-4">{t("syncConflicts")}</h2>
-          <p>{t("syncConflictIntro")}</p>
+        <section className="studio-card sync-conflicts" aria-labelledby="sync-conflicts-heading">
+          <div className="studio-card-header">
+            <div className="studio-card-heading">
+              <h2 id="sync-conflicts-heading" className="studio-card-title">{t("syncConflicts")}</h2>
+              <span className="count-pill is-bad">{conflicts.length}</span>
+              <p className="studio-card-description">{t("syncConflictIntro")}</p>
+            </div>
+          </div>
           <ul>
             {conflicts.map(record => (
-              <li key={record.path} className="query-row">
-                <p><strong>{t(recordLabels[record.desired.kind])}</strong>
-                  {record.desired.kind === "number" && <> · {record.desired.id}</>}</p>
-                <div className="grid gap-4 sm:grid-cols-2">
-                  <div className="min-w-0"><h3>{t("syncLocalVersion")}</h3><RecordVersion document={record.desired} /></div>
-                  <div className="min-w-0"><h3>{t("syncRemoteVersion")}</h3><RecordVersion document={record.conflict!} /></div>
+              <li key={record.path} className="sync-item">
+                <p className="sync-item-title">
+                  <strong>{t(recordLabels[record.desired.kind])}</strong>
+                  {record.desired.kind === "number" && <> · <span className="sync-item-id">{record.desired.id}</span></>}
+                </p>
+                <div className="sync-versions">
+                  <div className="sync-version"><h3>{t("syncLocalVersion")}</h3><RecordVersion document={record.desired} /></div>
+                  <div className="sync-version"><h3>{t("syncRemoteVersion")}</h3><RecordVersion document={record.conflict!} /></div>
                 </div>
-                <div className="query-actions mt-3">
-                  <button className="query-secondary" disabled={busy} onClick={() => void perform(() => resolveConflict(record, "local"))}>
-                    {t("syncKeepLocal")}
-                  </button>
-                  <button className="query-secondary" disabled={busy} onClick={() => void perform(() => resolveConflict(record, "remote"))}>
-                    {t("syncKeepRemote")}
-                  </button>
+                <div className="form-actions">
+                  <button type="button" className="btn btn-secondary" disabled={busy}
+                          onClick={() => void perform(() => resolveConflict(record, "local"))}>{t("syncKeepLocal")}</button>
+                  <button type="button" className="btn btn-secondary" disabled={busy}
+                          onClick={() => void perform(() => resolveConflict(record, "remote"))}>{t("syncKeepRemote")}</button>
                 </div>
               </li>
             ))}
           </ul>
         </section>
       )}
+
       {recoverable.length > 0 && (
-        <section>
-          <h2 className="headline-4">{t("syncRecovery")}</h2>
-          <p>{t("syncRecoveryIntro")}</p>
+        <section className="studio-card" aria-labelledby="sync-recovery-heading">
+          <div className="studio-card-header">
+            <div className="studio-card-heading">
+              <h2 id="sync-recovery-heading" className="studio-card-title">{t("syncRecovery")}</h2>
+              <span className="count-pill">{recoverable.length}</span>
+              <p className="studio-card-description">{t("syncRecoveryIntro")}</p>
+            </div>
+          </div>
           <ul>
             {recoverable.map(record => <RecoverQuery key={record.path} record={record} lists={lists} busy={busy}
               recover={id => void perform(() => recoverQuery(record, id))} />)}
