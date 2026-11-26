@@ -1,5 +1,6 @@
 .studio-header,
 .studio-nav,
+.studio-header-actions,
 .query-actions {
   display: flex;
   align-items: center;
@@ -19,12 +20,22 @@
   font-weight: 500;
 }
 
-.studio-nav a[aria-current="page"] {
+.studio-nav a[aria-current="page"],
+.studio-sync[aria-current="page"] {
   border-color: #a9113f;
 }
 
-.studio-language {
-  margin-left: auto;
+.studio-header-actions {
+  gap: .25rem;
+  margin-inline-start: auto;
+}
+
+.studio-sync {
+  display: grid;
+  place-items: center;
+  width: 2.75rem;
+  height: 2.75rem;
+  border-bottom: 2px solid transparent;
 }
 
 .query-actions {
@@ -168,6 +179,66 @@
   margin-top: 1rem;
 }
 
+.saved-numbers-heading,
+.saved-number-summary {
+  display: flex;
+  justify-content: space-between;
+  gap: .5rem 1rem;
+  align-items: baseline;
+  flex-wrap: wrap;
+}
+
+.saved-numbers-link {
+  font-size: .9375rem;
+  font-weight: 600;
+  text-decoration: underline;
+  text-underline-offset: .2em;
+}
+
+.saved-numbers-section + .saved-numbers-section {
+  margin-top: 2rem;
+}
+
+.saved-numbers-heading {
+  padding-bottom: .75rem;
+  border-bottom: 1px solid color-mix(in srgb, currentColor 28%, transparent);
+}
+
+.saved-number-row,
+.saved-numbers-section > .segment-form {
+  padding-block: 1rem;
+  border-bottom: 1px solid color-mix(in srgb, currentColor 16%, transparent);
+}
+
+.saved-number {
+  font-variant-numeric: tabular-nums;
+  overflow-wrap: anywhere;
+}
+
+.saved-numbers-empty {
+  opacity: .8;
+  padding-top: .75rem;
+}
+
+.segment-form-length {
+  margin: .25rem 0 .75rem;
+  text-align: end;
+  font-size: .875rem;
+}
+
+.saved-numbers-page :disabled,
+.segment-form :disabled {
+  opacity: .6;
+  cursor: default;
+}
+
+.saved-numbers-link:focus-visible,
+.saved-numbers-page :focus-visible,
+.segment-form :focus-visible {
+  outline: 2px solid currentColor;
+  outline-offset: 3px;
+}
+
 @media (max-width: 36rem) {
   .query-list-select {
     flex-basis: 100%;
@@ -178,8 +249,25 @@
     gap: .5rem 1rem;
   }
 
+  .studio-header #logo {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .studio-header #logo svg {
+    max-width: 100%;
+  }
+
   .studio-nav {
     order: 1;
     width: 100%;
+  }
+}
+
+@media (max-width: 28rem) {
+  .saved-numbers-heading,
+  .saved-number-summary {
+    flex-direction: column;
+    align-items: flex-start;
   }
 }

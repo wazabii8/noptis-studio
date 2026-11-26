@@ -7,7 +7,22 @@ import { requestPersistentStorage } from "./lib/persistentStorage";
 import { LocaleProvider } from "@/i18n/LocaleProvider";
 import { registerGoatCounter } from "@/lib/analytics";
 
-registerGoatCounter();
+import { startSynchronization } from "./lib/synchronization";
+
+async function start() {
+  const synchronization = startSynchronization().catch(() => {});
+  if (location.search || location.hash.includes("=")) await synchronization;
+  registerGoatCounter();
+  createRoot(document.getElementById("root")!).render(
+    <StrictMode>
+      <LocaleProvider>
+        <App />
+      </LocaleProvider>
+    </StrictMode>
+  );
+}
+
+void start();
 
 // Will add a persistent storage request to the browser
 void requestPersistentStorage();
@@ -22,11 +37,3 @@ const updateSW = registerSW({
     console.log("App is ready to work offline");
   },
 });
-
-createRoot(document.getElementById("root")!).render(
-  <StrictMode>
-    <LocaleProvider>
-      <App />
-    </LocaleProvider>
-  </StrictMode>
-);

@@ -1,4 +1,5 @@
 import {useState} from "react";
+import {StaleRecordError} from "@/lib/localDb";
 import {useTranslation} from "@/i18n/useTranslation";
 import {countListQueries, type ListFields, type QueryList} from "@/lib/queries";
 import QueryForm from "./QueryForm";
@@ -7,7 +8,7 @@ type Props = {
   list: QueryList;
   onSave: (fields: ListFields) => Promise<void>;
   onCancel: () => void;
-  onDelete: () => Promise<void>;
+  onDelete: (count: number | undefined) => Promise<void>;
   busy: boolean;
 };
 
@@ -15,7 +16,7 @@ export default function ManageListForm({list, onSave, onCancel, onDelete, busy}:
   const {t} = useTranslation();
   const [count, setCount] = useState<number>();
   const [counting, setCounting] = useState(false);
-  const [error, setError] = useState<"loadFailed" | "deleteListFailed">();
+  const [error, setError] = useState<"loadFailed" | "deleteListFailed" | "staleRecord">();
 
   async function requestDelete() {
     setCounting(true);
@@ -32,9 +33,9 @@ export default function ManageListForm({list, onSave, onCancel, onDelete, busy}:
   async function confirmDelete() {
     setError(undefined);
     try {
-      await onDelete();
-    } catch {
-      setError("deleteListFailed");
+      await onDelete(count);
+    } catch (error) {
+      setError(error instanceof StaleRecordError ? "staleRecord" : "deleteListFailed");
     }
   }
 

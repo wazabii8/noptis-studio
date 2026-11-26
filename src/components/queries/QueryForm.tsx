@@ -1,4 +1,5 @@
 import {useId, useState, type FormEvent} from "react";
+import {StaleRecordError} from "@/lib/localDb";
 import {useTranslation} from "@/i18n/useTranslation";
 import {isBuiltInListTitle, type ListFields, type QueryFields} from "@/lib/queries";
 
@@ -17,7 +18,7 @@ export default function QueryForm({kind, initial, onSave, onCancel, onRequestDel
   const [description, setDescription] = useState(initial?.description ?? "");
   const [sql, setSql] = useState(initial?.sql ?? "");
   const [saving, setSaving] = useState(false);
-  const [failed, setFailed] = useState(false);
+  const [failure, setFailure] = useState<"staleRecord" | "saveFailed">();
   const reservedTitle = kind === "list" && isBuiltInListTitle(title);
   const valid = title.trim() && !reservedTitle && (kind === "list" || sql.trim());
   const heading = kind === "list"
@@ -28,11 +29,11 @@ export default function QueryForm({kind, initial, onSave, onCancel, onRequestDel
     event.preventDefault();
     if (!valid || saving) return;
     setSaving(true);
-    setFailed(false);
+    setFailure(undefined);
     try {
       await onSave({title: title.trim(), description: description.trim(), sql});
-    } catch {
-      setFailed(true);
+    } catch (error) {
+      setFailure(error instanceof StaleRecordError ? "staleRecord" : "saveFailed");
       setSaving(false);
     }
   }
@@ -55,7 +56,7 @@ export default function QueryForm({kind, initial, onSave, onCancel, onRequestDel
                       value={sql} onChange={e => setSql(e.target.value)} />
           </>
         )}
-        {failed && <p role="alert">{t("saveFailed")}</p>}
+        {failure && <p role="alert">{t(failure)}</p>}
         <div className="query-actions">
           <button type="submit" className="query-primary" disabled={!valid}>
             {t(kind === "list" && initial ? "saveChanges" : "save")}

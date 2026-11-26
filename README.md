@@ -23,8 +23,19 @@ NOPTIS Studio provides live inspection of NOPTIS GIDs directly in the browser.
 - Supports English and Swedish
 - Lets you add familiar names to identifiers such as TPA and TPO numbers
 - Keeps those names locally on your device
+- Optionally syncs saved numbers, query lists, and SQL to your own Remote storage account
 
 There is no account to create and no data needs to be uploaded to a server. Enter a GID, inspect it, and continue with your work.
+
+## Optional synchronization
+
+Set up Remote storage synchronization directly in your browser.
+
+1. Create a Remote storage account on the [5apps Storage registration page](https://5apps.com/users/sign_up?site=storage).
+2. In NOPTIS Studio, select **Synchronization** next to the language toggle. Enter your Remote storage address, for example `your_username@5apps.com`, and click **Connect**.
+3. Sign in to 5apps if prompted and approve access. When NOPTIS Studio shows **Connected**, your saved numbers, query lists, and SQL can sync.
+
+To sync another device, open NOPTIS Studio in its browser and connect using the same address.
 
 ## Use it as an app
 
@@ -90,7 +101,7 @@ Feature suggestions are also welcome through the [issue tracker](https://github.
 
 ## Privacy
 
-The GIDs you inspect and the custom names you save remain in your browser. NOPTIS Studio does not require an account and is intended to be a simple tool you can open and use immediately.
+GID input, saved numbers, and queries stay in your browser by default. If you enable synchronization, NOPTIS Studio copies the saved records to the storage account you authorize. The GIDs you enter for inspection stay local unless you save them as records.
 
 ## Open source
 

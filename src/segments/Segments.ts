@@ -1,4 +1,19 @@
-import { t, type Locale } from "@/i18n/locale";
+import { t, type Locale, type TranslationKey } from "@/i18n/locale";
+
+export const GID_LENGTH = 16;
+export const savedNumberLabels = {
+  GID: "GIDNumber",
+  THM: "thmNumber",
+  CONTRACTOR: "contractorNumber",
+} as const satisfies Record<string, TranslationKey>;
+
+export type SavedNumberKind = keyof typeof savedNumberLabels;
+
+export function isSavedNumberKind(key: string): key is SavedNumberKind {
+  return Object.hasOwn(savedNumberLabels, key);
+}
+
+export type GidLayoutItem = keyof ReturnType<typeof createSegments> | {index: string};
 
 export const createGidTypes = (locale: Locale) => ({
   TRANSPORT_AUTHORITY: {
@@ -101,7 +116,7 @@ export const createGidTypes = (locale: Locale) => ({
     prefix: "9095",
     layout: ["PREFIX", "THM", "EQUIP"],
   },
-});
+} satisfies Record<string, {label: string; prefix: string; layout: GidLayoutItem[]}>);
 
 export const createSegments = (locale: Locale) => ({
   PREFIX: { length: 4, label: t(locale, "prefix", "Prefix"), description: t(locale, "prefixDesc", "") },

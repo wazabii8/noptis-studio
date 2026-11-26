@@ -97,6 +97,7 @@
 }
 
 :root {
+    --link-hover-color: #747bff;
     font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
     line-height: 1.5;
     font-weight: 400;
@@ -321,10 +322,15 @@
     }
 
     a:hover {
-        color: #747bff;
+        color: var(--link-hover-color);
     }
 
     input, textarea, table td, table th{
         border-color: #111;
     }
+}
+
+.studio-header a:hover,
+.studio-language:hover {
+    color: var(--link-hover-color);
 }

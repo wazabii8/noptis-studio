@@ -1,93 +1,48 @@
-import {createSegments} from "@/segments/Segments";
+import {createGidTypes, createSegments, GID_LENGTH, type GidLayoutItem, type SavedNumberKind} from "@/segments/Segments";
 import {t, type Locale} from "@/i18n/locale";
 
-type LayoutItem = string | { index: string };
-
-type GidType = {
-  inpValue: string;
+function hasDigitWidth(input: string, length: number) {
+  return input.length === length && /^[0-9]+$/.test(input);
 }
 
-
-/**
- * Extracts the prefix (first 4 characters) from an input string.
- * No validation of input format or length is performed.
- *
- * @param {string} input Raw GID string.
- * @returns {string} Extracted prefix.
- */
-export function getPrefixFromStr(input: string): string {
-  return input.substring(0, 4);
-}
-
-/**
- * Returns all GID type entries matching a given prefix.
- * If no match is found, an empty object is returned.
- *
- * @param {object} GidTypes Registry of available GID types.
- * @param {string} prefix Prefix to match.
- * @returns {object} Filtered GID types keyed as in the source object.
- */
-export function getGidTypeFromPrefix(GidTypes: object, prefix: string): object {
-  return Object.fromEntries(
-    Object.entries(GidTypes).filter(([, value]) => value.prefix === prefix)
-  );
-}
-
-
-/**
- * Index checker
- * @param x
- */
-const hasIndex = (x: LayoutItem): x is { index: string } => {
-  return typeof x === "object" && x !== null && "index" in x;
-}
-
-
-/**
- * Splits an input GID string into segments based on a type layout.
- *
- * @param lang
- * @param {string[]} gidTypeLayout GID type definition containing a layout array.
- * @param {string} input Raw GID string.
- * @returns {Array<{key: string, value: string, label: string}>} Ordered segment extraction result.
- */
-export function getSegmentedResult(lang: Locale, gidTypeLayout: string[], input: string): object {
-  const result = [];
+/** Splits the input into fields, retaining partial values for the inspector. */
+export function getSegmentedResult(lang: Locale, layout: GidLayoutItem[], input: string) {
+  const definitions = createSegments(lang);
   let start = 0;
-  for (const layout of gidTypeLayout) {
-    const segments = createSegments(lang)
-    const row = segments[layout as keyof typeof segments];
 
-    const isPadding = hasIndex(layout);
-    const length = isPadding ? layout.index.length : row.length;
-    const inpValue = input.substring(start, start + length);
-    const isValid = isPadding ? (layout.index === inpValue) : (row.length === inpValue.length);
+  return layout.map(item => {
+    const isPadding = typeof item !== "string";
+    const definition = isPadding ? undefined : definitions[item];
+    const expected = isPadding ? item.index : "0".repeat(definitions[item].length);
+    const inpValue = input.slice(start, start + expected.length);
+    start += expected.length;
+    const isValid = isPadding ? inpValue === expected : hasDigitWidth(inpValue, expected.length);
 
-    result.push({
-      key: layout,
-      value: isPadding ? layout.index : (isValid ? inpValue : "0".repeat(row.length)),
-      inpValue: inpValue,
-      label: row?.label ?? "Padding",
-      isValid: isValid,
-      isPadding: isPadding,
-      description: row?.description ?? t(lang, "paddingDesc"),
-    });
-
-    start += length
-  }
-  return result;
+    return {
+      key: isPadding ? "PADDING" : item,
+      value: isValid ? inpValue : expected,
+      inpValue,
+      label: definition?.label ?? t(lang, "padding"),
+      description: definition?.description ?? t(lang, "paddingDesc"),
+      isValid,
+    };
+  });
 }
 
-/**
- * Returns a valid GID string from an array list of segments
- *
- * @param segments
- */
-export function getGIDFromSegmentObj(segments: GidType[]): string {
-  let value = "";
-  for (const segment of segments) {
-    const {inpValue} = segment;
-    value += inpValue;
-  }
-  return value;
+export type Segment = ReturnType<typeof getSegmentedResult>[number];
+
+export function parseGid(lang: Locale, input: string) {
+  const gidType = Object.values(createGidTypes(lang)).find(type => type.prefix === input.slice(0, 4));
+  if (!gidType) return null;
+
+  const segments = getSegmentedResult(lang, gidType.layout, input);
+  const isValid = hasDigitWidth(input, GID_LENGTH) && segments.every(segment => segment.isValid)
+    && segments.reduce((length, segment) => length + segment.inpValue.length, 0) === input.length;
+  return {label: gidType.label, segments, isValid};
+}
+
+export function isValidSavedNumber(lang: Locale, kind: SavedNumberKind, input: string) {
+  if (kind === "GID") return parseGid(lang, input)?.isValid ?? false;
+
+  return hasDigitWidth(input, createSegments(lang)[kind].length);
 }

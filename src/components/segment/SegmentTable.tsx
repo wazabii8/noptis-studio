@@ -1,130 +1,95 @@
-import Modal from "@/components/ui/Modal.tsx";
-import Article from "@/components/ui/Article.tsx";
-import SegmentForm from "@/components/segment/SegmentForm.tsx";
-import SegmentValueButton from "@/components/segment/SegmentValueButton.tsx";
-import {type ReactNode, useState} from "react";
-import {getGIDFromSegmentObj} from "@/utils/Helpers.ts";
-import {useTranslation} from "@/i18n/useTranslation.ts";
-
-type Segment = {
-  key: string;
-  label: string;
-  description: string;
-  value: string;
-  inpValue: string;
-  isValid: boolean;
-  isPadding: boolean;
-};
+import Modal from "@/components/ui/Modal";
+import Article from "@/components/ui/Article";
+import SegmentForm from "./SegmentForm";
+import SegmentValueButton from "./SegmentValueButton";
+import {type ReactNode, useEffect, useState} from "react";
+import {useDbVersion} from "@/lib/dbChanges";
+import {getAllGidSegments, saveGidSegment, type GidSegmentValue} from "@/lib/localDb";
+import {isSavedNumberKind, type SavedNumberKind} from "@/segments/Segments";
+import {type Segment} from "@/utils/Helpers";
+import {useTranslation} from "@/i18n/useTranslation";
 
 type SegmentTableProps = {
-  title: string;
+  gid: string;
+  gidValid: boolean;
   segments: Segment[];
 };
 
-function SegmentTable({title, segments}: SegmentTableProps) {
+function SegmentTable({gid, gidValid, segments}: SegmentTableProps) {
   const {t} = useTranslation();
-  const [show, setShow] = useState(false);
   const [modalContent, setModalContent] = useState<ReactNode>(null);
-  const [savedValues, setSavedValues] = useState<Record<string, string>>({});
-  const GID = getGIDFromSegmentObj(segments);
-  const GIDName = `GID_${GID}`;
+  const dbVersion = useDbVersion();
+  const [savedValues, setSavedValues] = useState<Record<string, GidSegmentValue> | null>(null);
+  const [loadFailed, setLoadFailed] = useState(false);
+  const closeModal = () => setModalContent(null);
 
-  const openModal = (segment: Segment) => {
-    setShow(true);
-    setModalContent(
-      <Article
-        title={segment.label}
-        description={segment.description}
-        dangerously={true}
-      />
+  useEffect(() => {
+    let active = true;
+    getAllGidSegments().then(records => {
+      if (active) setSavedValues(Object.fromEntries(records.map(record => [record.key, record])));
+    }).catch(() => {
+      if (active) setLoadFailed(true);
+    });
+    return () => { active = false; };
+  }, [dbVersion]);
+
+  function renderEditableValue(kind: string, number: string, valid: boolean) {
+    if (!valid || !savedValues || !isSavedNumberKind(kind)) {
+      return <SegmentValueButton value={number} valid={valid} />;
+    }
+
+    const key = `${kind}_${number}`;
+    const savedValue = savedValues[key];
+    return (
+      <SegmentValueButton value={number} valid={valid} savedValue={savedValue?.value}
+                          onEdit={() => openEditor(kind, number, savedValue)} />
     );
-  };
+  }
 
-  const closeModal = () => {
-    setShow(false);
-  };
-
-  const openFormModal = (
-    title: string,
-    segmentName: string,
-    value: string
-  ) => {
-    setShow(true);
+  function openEditor(kind: SavedNumberKind, number: string, savedValue?: GidSegmentValue) {
     setModalContent(
       <SegmentForm
-        title={title}
-        segmentKey={segmentName}
-        segmentValue={value}
-        onSaved={(key, savedValue) => {
-          setShow(false);
-          setSavedValues((current) => ({
-            ...current,
-            [key]: savedValue,
-          }));
+        kind={kind}
+        number={number}
+        initialText={savedValue?.value}
+        onCancel={closeModal}
+        onSave={async (number, value) => {
+          const key = `${kind}_${number}`;
+          const record = await saveGidSegment(key, value, savedValue?.revision ?? null);
+          setSavedValues(current => ({...current, [key]: record}));
+          closeModal();
         }}
       />
     );
-  };
+  }
 
   return (
     <div>
-      <Modal
-        title={title}
-        content={modalContent}
-        open={show}
-        onClose={closeModal}
-      />
-
+      <Modal title={t("GIDSegmentDetails")} content={modalContent} open={modalContent !== null} onClose={closeModal} />
+      {loadFailed && <p role="alert">{t("loadFailed")}</p>}
       <table>
         <tbody>
-        {segments.map((segment, index) => {
-          const segmentName = `${segment.key}_${segment.inpValue}`;
-
-          return (
-            <tr key={`${segment.key}-${index}`}>
-              <th>
-                <button onClick={() => openModal(segment)}>
-                  {segment.label}
-                </button>
-              </th>
-
-              <td
-                className={segment.isValid ? "valid" : "error"}
-                title={
-                  segment.isValid
-                    ? segment.value
-                    : `${segment.inpValue}->${segment.value}`
-                }
-              >
-                <SegmentValueButton
-                  title={segment.label}
-                  valid={segment.isValid}
-                  value={segment.inpValue}
-                  segmentKey={segment.key}
-                  savedValue={savedValues[segmentName]}
-                  onOpen={openFormModal}
-                />
-              </td>
-            </tr>
-          );
-        })}
+        {segments.map((segment, index) => (
+          <tr key={`${segment.key}-${index}`}>
+            <th scope="row">
+              <button type="button" onClick={() => setModalContent(
+                <Article title={segment.label} description={segment.description} dangerously={true} />
+              )}>
+                {segment.label}
+              </button>
+            </th>
+            <td className={segment.isValid ? "valid" : "error"}
+                title={segment.isValid ? segment.value : `${segment.inpValue}->${segment.value}`}>
+              {renderEditableValue(segment.key, segment.inpValue, segment.isValid)}
+            </td>
+          </tr>
+        ))}
         </tbody>
       </table>
-
-      {GID && (
-        <div className={"mt-5 text-xl flex gap-2"}>
-          <strong className={"min-w-31"}>{t("GIDNumber")}:</strong>
-          <SegmentValueButton
-            title={"GID"}
-            valid={GID.length === 16}
-            value={GID}
-            segmentKey={"GID"}
-            savedValue={savedValues[GIDName]}
-            onOpen={openFormModal}
-          />
-        </div>
-      )}
-
+      <div className="mt-5 text-xl flex flex-wrap gap-2">
+        <strong className="min-w-31">{t("GIDNumber")}:</strong>
+        {renderEditableValue("GID", gid, gidValid)}
+      </div>
     </div>
   );
 }

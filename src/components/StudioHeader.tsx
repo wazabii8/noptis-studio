@@ -1,8 +1,15 @@
 import {useLocale} from "@/i18n/LocaleContext";
 import {t} from "@/i18n/locale";
 
-export default function StudioHeader({queriesOpen}: {queriesOpen: boolean}) {
+type StudioHeaderProps = {
+  queriesOpen: boolean;
+  savedNumbersOpen: boolean;
+  syncOpen: boolean;
+};
+
+export default function StudioHeader({queriesOpen, savedNumbersOpen, syncOpen}: StudioHeaderProps) {
   const {lang, toggleLang} = useLocale();
+  const syncTitle = t(lang, 'syncTitle');
   return (
     <header id={"header"} className="studio-header border-bottom">
       <figure id={"logo"} aria-label="NOPTIS Studio">
@@ -16,10 +23,20 @@ export default function StudioHeader({queriesOpen}: {queriesOpen: boolean}) {
         </svg>
       </figure>
       <nav className="studio-nav" aria-label={t(lang, 'navigation')}>
-        <a href="#gid" aria-current={queriesOpen ? undefined : 'page'}>GID</a>
+        <a href="#gid" aria-current={(queriesOpen || savedNumbersOpen || syncOpen) ? undefined : 'page'}>GID</a>
+        <a href="#gid-saved" aria-current={savedNumbersOpen ? 'page' : undefined}>{t(lang, 'savedNumbersTitle')}</a>
         <a href="#queries" aria-current={queriesOpen ? 'page' : undefined}>{t(lang, 'queriesTitle')}</a>
       </nav>
-      <button className="studio-language p-2 rounded-2xl" onClick={toggleLang}>{lang.toUpperCase()}</button>
+      <div className="studio-header-actions">
+        <a href="#sync" className="studio-sync" aria-label={syncTitle} title={syncTitle}
+           aria-current={syncOpen ? 'page' : undefined}>
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+               strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+            <path d="M4 11a8 8 0 0 1 13.7-4.7L20 9m0-5v5h-5M20 13a8 8 0 0 1-13.7 4.7L4 15m0 5v-5h5" />
+          </svg>
+        </a>
+        <button type="button" className="studio-language p-2 rounded-2xl" onClick={toggleLang}>{lang.toUpperCase()}</button>
+      </div>
     </header>
   );
 }

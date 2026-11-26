@@ -1,14 +1,15 @@
-import {useMemo, useState, useSyncExternalStore} from 'react'
+import {useEffect, useMemo, useState, useSyncExternalStore} from 'react'
 import './App.css'
-import {createGidTypes} from "./segments/Segments.ts";
-import * as Helpers from "./utils/Helpers.ts";
+import {parseGid} from "./utils/Helpers.ts";
 import SegmentTable from "@/components/segment/SegmentTable.tsx";
 import {t} from './i18n/locale'
 import {useLocale} from "@/i18n/LocaleContext";
 import Modal from "@/components/ui/Modal.tsx";
 import SegmentOverview from "@/components/segment/SegmentOverview.tsx";
+import SavedNumbersPage from "@/components/segment/SavedNumbersPage.tsx";
 
 import StudioHeader from "@/components/StudioHeader";
+import SyncSettingsPage from "@/components/SyncSettingsPage";
 import QueriesPage from "@/components/queries/QueriesPage";
 
 function subscribeToPageChange(onChange: () => void) {
@@ -16,46 +17,32 @@ function subscribeToPageChange(onChange: () => void) {
   return () => window.removeEventListener('hashchange', onChange);
 }
 
-function isQueriesPage() {
-  return window.location.hash === '#queries';
+function getPage() {
+  return window.location.hash;
 }
 
-type Segment = {
-  key: string;
-  label: string;
-  description: string;
-  value: string;
-  inpValue: string;
-  isValid: boolean;
-  isPadding: boolean;
-};
+const savedNumbersHash = '#gid-saved';
 
 function App() {
 
   const {lang} = useLocale();
-  const [value, setValue] = useState('')
-  const gidTypes = useMemo(() => createGidTypes(lang), [lang]);
-  const queriesOpen = useSyncExternalStore(subscribeToPageChange, isQueriesPage);
+  const [value, setValue] = useState(() => {
+    const previousInput: unknown = window.history.state?.gidInspectorInput;
+    return getPage() === savedNumbersHash && typeof previousInput === 'string' ? previousInput : '';
+  });
+  const page = useSyncExternalStore(subscribeToPageChange, getPage);
+  const queriesOpen = page === '#queries';
+  const syncOpen = page === '#sync';
+  const savedNumbersOpen = page === savedNumbersHash;
   const [show, setShow] = useState(false);
 
-  /**
-   * Extracts the prefix, returns all GID type entries matching a given prefix,
-   * and lastly, Splits an input GID string into segments based on a type layout.
-   */
-  const gidResult = useMemo(() => {
-    const prefix = Helpers.getPrefixFromStr(value);
-    const result = Helpers.getGidTypeFromPrefix(gidTypes, prefix);
-    const type = Object.keys(result)[0] ?? false;
+  const gidResult = useMemo(() => parseGid(lang, value), [lang, value]);
 
-    if (!type) return null;
-
-    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-    // @ts-expect-error
-    const gidType = result[type];
-    const segmentedResult = Helpers.getSegmentedResult(lang, gidType.layout, value);
-
-    return {gidType, segmentedResult};
-  }, [value, gidTypes, lang]);
+  useEffect(() => {
+    if (savedNumbersOpen && window.history.state?.gidInspectorInput !== value) {
+      window.history.replaceState({...window.history.state, gidInspectorInput: value}, '');
+    }
+  }, [savedNumbersOpen, value]);
 
   const openGidOverview = () => {
     setShow(true);
@@ -63,8 +50,11 @@ function App() {
 
   return (
     <>
-      <StudioHeader queriesOpen={queriesOpen} />
-      {queriesOpen ? <QueriesPage /> : (
+      <StudioHeader queriesOpen={queriesOpen} savedNumbersOpen={savedNumbersOpen} syncOpen={syncOpen} />
+      {syncOpen && <SyncSettingsPage />}
+      {queriesOpen && <QueriesPage />}
+      {savedNumbersOpen && <SavedNumbersPage />}
+      {!queriesOpen && !savedNumbersOpen && !syncOpen && (
         <main>
           <Modal
             title={"GID Segment Overview"}
@@ -93,9 +83,8 @@ function App() {
 
               {gidResult && (
                 <div>
-                  <h2 className={"headline-4 mb-2"}>{gidResult.gidType.label}</h2>
-                  <SegmentTable title={t(lang, "GIDSegmentDetails")}
-                                segments={gidResult.segmentedResult as Segment[]}></SegmentTable>
+                  <h2 className={"headline-4 mb-2"}>{gidResult.label}</h2>
+                  <SegmentTable gid={value} gidValid={gidResult.isValid} segments={gidResult.segments} />
                 </div>
               )}
             </div>

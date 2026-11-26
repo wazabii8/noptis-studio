@@ -1,83 +1,66 @@
-import {dbPromise} from "./localDb";
+import {checkRevision, dbPromise, queueDocument, StaleRecordError, writeStudio} from "./localDb";
+import type {QueryList, SavedQuery} from "./localDb";
+import {builtInLists, isBuiltInList, isBuiltInListTitle, makeDocument} from "./syncRecords";
+import type {ListFields, QueryFields} from "./syncRecords";
 
-export type ListFields = {title: string; description: string};
-export type QueryFields = ListFields & {sql: string};
-export type QueryList = ListFields & {id: number};
-export type SavedQuery = QueryFields & {id: number; listId: number};
-
-// IndexedDB assigns positive IDs to user-created lists.
-const builtInLists = [{id: -1, title: "DOI"}, {id: -2, title: "ROI"}];
-
-export function isBuiltInList(id: number) {
-  return builtInLists.some(list => list.id === id);
-}
-
-export function isBuiltInListTitle(title: string) {
-  return builtInLists.some(list => list.title === title.trim().toUpperCase());
-}
+export type {QueryList, SavedQuery, ListFields, QueryFields};
+export {isBuiltInList, isBuiltInListTitle};
 
 export async function getQueryLists(): Promise<QueryList[]> {
-  const tx = (await dbPromise).transaction(["queryLists", "queries"], "readwrite");
-  const listStore = tx.objectStore("queryLists");
-  const queryIndex = tx.objectStore("queries").index("listId");
-  const savedLists: QueryList[] = await listStore.getAll();
-  const pinned: QueryList[] = [];
-  const custom = savedLists.filter(list => !isBuiltInList(list.id) && !isBuiltInListTitle(list.title));
-
-  for (const builtIn of builtInLists) {
-    const saved = savedLists.find(list => list.id === builtIn.id);
-    const legacy = savedLists.filter(list =>
-      !isBuiltInList(list.id) && list.title.trim().toUpperCase() === builtIn.title
-    );
-    const description = [saved, ...legacy].map(list => list?.description).filter(Boolean).join("\n\n");
-    const list = {...builtIn, description};
-    if (!saved || legacy.length > 0) await listStore.put(list);
-
-    for (const oldList of legacy) {
-      let cursor = await queryIndex.openCursor(oldList.id);
-      while (cursor) {
-        await cursor.update({...cursor.value, listId: builtIn.id});
-        cursor = await cursor.continue();
-      }
-      await listStore.delete(oldList.id);
-    }
-    pinned.push(list);
-  }
-
-  await tx.done;
-  return [...pinned, ...custom];
+  const lists = await (await dbPromise).getAll("queryLists") as QueryList[];
+  const pinned = builtInLists.map(builtIn => lists.find(list => list.id === builtIn.id)!);
+  return [...pinned, ...lists.filter(list => !isBuiltInList(list.id))];
 }
 
 export async function createQueryList(fields: ListFields): Promise<QueryList> {
   if (isBuiltInListTitle(fields.title)) throw new Error("Built-in list title");
-  const id = await (await dbPromise).add("queryLists", fields);
-  return {...fields, id: Number(id)};
+  return writeStudio(async tx => {
+    const syncId = crypto.randomUUID();
+    const doc = makeDocument("list", syncId, fields);
+    const list = {...fields, syncId, revision: doc.revision};
+    const id = await tx.objectStore("queryLists").add(list);
+    await queueDocument(tx.objectStore("syncRecords"), doc);
+    return {...list, id};
+  });
 }
 
 export async function editQueryList(list: QueryList) {
   if (isBuiltInList(list.id) || isBuiltInListTitle(list.title)) throw new Error("Built-in list");
-  const tx = (await dbPromise).transaction("queryLists", "readwrite");
-  const cursor = await tx.store.openCursor(list.id);
-  if (!cursor) throw new Error("List no longer exists");
-  await cursor.update(list);
-  await tx.done;
+  return writeStudio(async tx => {
+    const store = tx.objectStore("queryLists");
+    const current = await store.get(list.id);
+    if (!current) throw new StaleRecordError();
+    checkRevision(current.revision, list.revision);
+    const doc = makeDocument("list", current.syncId, {title: list.title, description: list.description});
+    const updated = {...list, syncId: current.syncId, revision: doc.revision};
+    await store.put(updated);
+    await queueDocument(tx.objectStore("syncRecords"), doc);
+    return updated;
+  });
 }
 
-export async function deleteQueryList(listId: number) {
+export async function deleteQueryList(listId: number, expected?: string, expectedCount?: number) {
   if (isBuiltInList(listId)) throw new Error("Built-in list");
-  const tx = (await dbPromise).transaction(["queryLists", "queries"], "readwrite");
-  const index = tx.objectStore("queries").index("listId");
-  let cursor = await index.openCursor(listId);
-  while (cursor) {
-    await cursor.delete();
-    cursor = await cursor.continue();
-  }
-  await tx.objectStore("queryLists").delete(listId);
-  await tx.done;
+  await writeStudio(async tx => {
+    const listStore = tx.objectStore("queryLists");
+    const list = await listStore.get(listId);
+    checkRevision(list?.revision, expected);
+    if (!list) return;
+    const index = tx.objectStore("queries").index("listId");
+    if (expectedCount !== undefined && await index.count(listId) !== expectedCount) throw new StaleRecordError();
+    let cursor = await index.openCursor(listId);
+    while (cursor) {
+      await queueDocument(tx.objectStore("syncRecords"), makeDocument("query", cursor.value.syncId, null));
+      await cursor.delete();
+      cursor = await cursor.continue();
+    }
+    await listStore.delete(listId);
+    await queueDocument(tx.objectStore("syncRecords"), makeDocument("list", list.syncId, null));
+  });
 }
 
 export async function getListQueries(listId: number): Promise<SavedQuery[]> {
-  return (await dbPromise).getAllFromIndex("queries", "listId", listId);
+  return (await dbPromise).getAllFromIndex("queries", "listId", listId) as Promise<SavedQuery[]>;
 }
 
 export async function countListQueries(listId: number): Promise<number> {
@@ -85,23 +68,42 @@ export async function countListQueries(listId: number): Promise<number> {
 }
 
 export async function addQuery(listId: number, fields: QueryFields): Promise<SavedQuery> {
-  const tx = (await dbPromise).transaction(["queryLists", "queries"], "readwrite");
-  const listKey = await tx.objectStore("queryLists").getKey(listId);
-  if (listKey === undefined) throw new Error("List no longer exists");
-  const query = {...fields, listId};
-  const id = await tx.objectStore("queries").add(query);
-  await tx.done;
-  return {...query, id: Number(id)};
+  return writeStudio(async tx => {
+    const list = await tx.objectStore("queryLists").get(listId);
+    if (!list) throw new StaleRecordError();
+    const syncId = crypto.randomUUID();
+    const doc = makeDocument("query", syncId, {...fields, parent: list.syncId});
+    const query = {...fields, listId, syncId, revision: doc.revision};
+    const id = await tx.objectStore("queries").add(query);
+    await queueDocument(tx.objectStore("syncRecords"), doc);
+    return {...query, id};
+  });
 }
 
 export async function editQuery(query: SavedQuery) {
-  const tx = (await dbPromise).transaction("queries", "readwrite");
-  const cursor = await tx.store.openCursor(query.id);
-  if (!cursor) throw new Error("Query no longer exists");
-  await cursor.update(query);
-  await tx.done;
+  return writeStudio(async tx => {
+    const {id, title, description, sql} = query;
+    const store = tx.objectStore("queries");
+    const current = await store.get(id);
+    if (!current) throw new StaleRecordError();
+    checkRevision(current.revision, query.revision);
+    const parent = await tx.objectStore("queryLists").get(current.listId);
+    if (!parent) throw new StaleRecordError();
+    const doc = makeDocument("query", current.syncId, {title, description, sql, parent: parent.syncId});
+    const updated = {...query, listId: current.listId, syncId: current.syncId, revision: doc.revision};
+    await store.put(updated);
+    await queueDocument(tx.objectStore("syncRecords"), doc);
+    return updated;
+  });
 }
 
-export async function deleteQuery(id: number) {
-  await (await dbPromise).delete("queries", id);
+export async function deleteQuery(id: number, expected?: string) {
+  await writeStudio(async tx => {
+    const store = tx.objectStore("queries");
+    const query = await store.get(id);
+    checkRevision(query?.revision, expected);
+    if (!query) return;
+    await store.delete(id);
+    await queueDocument(tx.objectStore("syncRecords"), makeDocument("query", query.syncId, null));
+  });
 }
