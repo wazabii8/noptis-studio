@@ -1,5 +1,6 @@
 {
   "title": "NOPTIS Studio",
+  "privacyPolicy": "Privacy policy",
   "titleGiDInspector": "NOPTIS GID Inspector",
   "descGiDInspector": "Paste a NOPTIS GID to break it into its segments and see everything it contains.",
   "queriesTitle": "NOPTIS Queries",

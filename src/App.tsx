@@ -62,6 +62,16 @@ function App() {
       {!queriesOpen && !savedNumbersOpen && !syncOpen && (
         <GidInspector value={value} onChange={setValue} onOpenLayouts={openGidOverview} />
       )}
+      <footer className="studio-footer">
+        <a
+          href="https://wazabii8.github.io/noptis-studio/privacy.html"
+          hrefLang="en"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          {t(lang, 'privacyPolicy')}
+        </a>
+      </footer>
     </>
   )
 }

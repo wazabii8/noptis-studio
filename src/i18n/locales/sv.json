@@ -1,5 +1,6 @@
 {
   "title": "NOPTIS Studio",
+  "privacyPolicy": "Integritetspolicy",
   "titleGiDInspector": "NOPTIS GID-granskare",
   "descGiDInspector": "Klistra in ett NOPTIS GID för att dela upp det i segment och se allt det innehåller.",
   "queriesTitle": "NOPTIS-frågor",
